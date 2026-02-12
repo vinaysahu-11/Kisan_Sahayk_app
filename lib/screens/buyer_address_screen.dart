@@ -114,83 +114,82 @@ class _BuyerAddressScreenState extends State<BuyerAddressScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                const Text('Add New Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: nameCtrl,
-                  decoration: const InputDecoration(labelText: 'Full Name *', border: OutlineInputBorder(), isDense: true),
-                  validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: mobileCtrl,
-                  decoration: const InputDecoration(labelText: 'Mobile Number *', border: OutlineInputBorder(), isDense: true),
-                  keyboardType: TextInputType.phone,
-                  validator: (v) => (v?.trim().length ?? 0) < 10 ? 'Enter valid mobile' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: addressCtrl,
-                  decoration: const InputDecoration(labelText: 'Address Line *', border: OutlineInputBorder(), isDense: true),
-                  maxLines: 2,
-                  validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: cityCtrl,
-                        decoration: const InputDecoration(labelText: 'City *', border: OutlineInputBorder(), isDense: true),
-                        validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
-                      ),
+              const Text('Add New Address', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Full Name *', border: OutlineInputBorder(), isDense: true),
+                validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: mobileCtrl,
+                decoration: const InputDecoration(labelText: 'Mobile Number *', border: OutlineInputBorder(), isDense: true),
+                keyboardType: TextInputType.phone,
+                validator: (v) => (v?.trim().length ?? 0) < 10 ? 'Enter valid mobile' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: addressCtrl,
+                decoration: const InputDecoration(labelText: 'Address Line *', border: OutlineInputBorder(), isDense: true),
+                maxLines: 2,
+                validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: cityCtrl,
+                      decoration: const InputDecoration(labelText: 'City *', border: OutlineInputBorder(), isDense: true),
+                      validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        controller: stateCtrl,
-                        decoration: const InputDecoration(labelText: 'State *', border: OutlineInputBorder(), isDense: true),
-                        validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
-                      ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      controller: stateCtrl,
+                      decoration: const InputDecoration(labelText: 'State *', border: OutlineInputBorder(), isDense: true),
+                      validator: (v) => v?.trim().isEmpty == true ? 'Required' : null,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: pincodeCtrl,
-                  decoration: const InputDecoration(labelText: 'Pincode *', border: OutlineInputBorder(), isDense: true),
-                  keyboardType: TextInputType.number,
-                  validator: (v) => (v?.trim().length ?? 0) < 6 ? 'Enter valid pincode' : null,
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), padding: const EdgeInsets.symmetric(vertical: 14)),
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        _service.addAddressFromFields(
-                          name: nameCtrl.text.trim(),
-                          mobile: mobileCtrl.text.trim(),
-                          addressLine: addressCtrl.text.trim(),
-                          city: cityCtrl.text.trim(),
-                          state: stateCtrl.text.trim(),
-                        if (mounted) {
-                          pincode: pincodeCtrl.text.trim(),
-                        );
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: pincodeCtrl,
+                decoration: const InputDecoration(labelText: 'Pincode *', border: OutlineInputBorder(), isDense: true),
+                keyboardType: TextInputType.number,
+                validator: (v) => (v?.trim().length ?? 0) < 6 ? 'Enter valid pincode' : null,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2E7D32), padding: const EdgeInsets.symmetric(vertical: 14)),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      _service.addAddressFromFields(
+                        name: nameCtrl.text.trim(),
+                        mobile: mobileCtrl.text.trim(),
+                        addressLine: addressCtrl.text.trim(),
+                        city: cityCtrl.text.trim(),
+                        state: stateCtrl.text.trim(),
+                        pincode: pincodeCtrl.text.trim(),
+                      );
+                      if (mounted) {
                         Navigator.pop(ctx);
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
-                        }
                           const SnackBar(content: Text('Address added'), backgroundColor: Color(0xFF2E7D32)),
                         );
                       }
-                    },
-                    child: const Text('Save Address', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                  ),
+                    }
+                  },
+                  child: const Text('Save Address', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

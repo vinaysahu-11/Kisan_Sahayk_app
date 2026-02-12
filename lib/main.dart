@@ -28,6 +28,8 @@ import 'package:fks_app/screens/main_wrapper_screen.dart';
 import 'package:fks_app/screens/seller_login_screen.dart';
 import 'package:fks_app/screens/admin_category_screen.dart';
 import 'package:fks_app/screens/admin_seller_screen.dart';
+import 'package:fks_app/widgets/auth_wrapper.dart';
+import 'providers/theme_provider.dart';
 import 'package:fks_app/screens/buyer_home_screen.dart';
 import 'package:fks_app/screens/buyer_product_list_screen.dart';
 import 'package:fks_app/screens/buyer_product_detail_screen.dart';
@@ -82,10 +84,14 @@ void main() async {
   final languageProvider = LanguageProvider();
   await languageProvider.loadSavedLanguage();
   
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadSavedTheme();
+  
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: languageProvider),
+        ChangeNotifierProvider.value(value: themeProvider),
       ],
       child: const MainApp(),
     ),
@@ -100,39 +106,15 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  ThemeMode _themeMode = ThemeMode.light;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadThemeMode();
-  }
-
-  Future<void> _loadThemeMode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isDark = prefs.getBool('is_dark_mode') ?? false;
-    setState(() {
-      _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
-    });
-  }
-
-  Future<void> toggleTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    final newMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-    await prefs.setBool('is_dark_mode', newMode == ThemeMode.dark);
-    setState(() {
-      _themeMode = newMode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       locale: languageProvider.locale,
-      themeMode: _themeMode,
+      themeMode: themeProvider.themeMode,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -144,6 +126,20 @@ class _MainAppState extends State<MainApp> {
         Locale('hi'),
         Locale('cg'),
       ],
+      localeResolutionCallback: (locale, supportedLocales) {
+        // If Chhattisgarhi (cg) is selected, use Hindi for Material components
+        if (locale?.languageCode == 'cg') {
+          return const Locale('hi');
+        }
+        // Check if the current locale is supported
+        for (var supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale?.languageCode) {
+            return supportedLocale;
+          }
+        }
+        // Fallback to English
+        return const Locale('en');
+      },
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,

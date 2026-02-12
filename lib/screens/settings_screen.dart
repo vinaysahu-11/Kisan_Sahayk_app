@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/app_localizations.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,7 +14,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool notificationsEnabled = true;
   bool weatherAlerts = true;
   bool priceUpdates = true;
-  bool darkMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -78,17 +79,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _SettingsSection(
               title: l10n.appearance,
               children: [
-                SwitchListTile(
-                  title: Text(l10n.darkMode),
-                  subtitle: Text(l10n.switchToDarkTheme),
-                  value: darkMode,
-                  onChanged: (value) {
-                    setState(() => darkMode = value);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.darkModeComingSoon)),
+                Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, child) {
+                    return SwitchListTile(
+                      title: Text(l10n.darkMode),
+                      subtitle: Text(l10n.switchToDarkTheme),
+                      value: themeProvider.themeMode == ThemeMode.dark,
+                      onChanged: (value) {
+                        themeProvider.setThemeMode(
+                          value ? ThemeMode.dark : ThemeMode.light,
+                        );
+                      },
+                      activeThumbColor: const Color(0xFF2E6B3F),
                     );
                   },
-                  activeThumbColor: const Color(0xFF2E6B3F),
                 ),
                 ListTile(
                   title: Text(l10n.language),
