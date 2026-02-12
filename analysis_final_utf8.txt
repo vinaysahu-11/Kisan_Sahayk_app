@@ -1,0 +1,23 @@
+﻿Analyzing fks_app...                                            
+
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\admin_delivery_partners_screen.dart:123:52 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\admin_delivery_partners_screen.dart:142:54 - use_build_context_synchronously
+  error - Too many positional arguments: 0 expected, but 1 found - lib\screens\buyer_checkout_screen.dart:300:13 - extra_positional_arguments_could_be_named
+  error - Expected to find ')' - lib\screens\buyer_checkout_screen.dart:356:13 - expected_token
+   info - Unnecessary braces in a string interpolation - lib\screens\buyer_product_list_screen.dart:130:29 - unnecessary_brace_in_string_interps
+warning - The value of the local variable 'labels' isn't used - lib\screens\buyer_product_list_screen.dart:204:25 - unused_local_variable
+  error - Undefined name 'count' - lib\screens\buyer_product_list_screen.dart:212:40 - undefined_identifier
+  error - Undefined name 'unit' - lib\screens\buyer_product_list_screen.dart:212:47 - undefined_identifier
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\delivery_registration_screen.dart:73:38 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\labour_partner\labour_application_status.dart:112:21 - use_build_context_synchronously
+   info - Library names are not necessary - lib\screens\labour_partner_screen.dart:1:9 - unnecessary_library_name
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\transport_partner\transport_partner_complete_registration.dart:51:23 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\transport_partner\transport_partner_complete_registration.dart:52:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\transport_partner\transport_partner_complete_registration.dart:54:47 - use_build_context_synchronously
+   info - Unnecessary use of string interpolation - lib\screens\transport_partner\transport_wallet_screen.dart:67:38 - unnecessary_string_interpolations
+   info - Unnecessary use of 'toList' in a spread - lib\screens\transport_partner\vehicle_details_screen.dart:179:16 - unnecessary_to_list_in_spreads
+   info - Library names are not necessary - lib\screens\transport_partner_screen.dart:1:9 - unnecessary_library_name
+   info - The private field _codFeePercent could be 'final' - lib\services\delivery_service.dart:22:10 - prefer_final_fields
+   info - Don't invoke 'print' in production code - lib\services\labour_booking_service.dart:235:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\transport_booking_service.dart:237:7 - avoid_print
+

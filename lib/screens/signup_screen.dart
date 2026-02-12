@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utils/app_localizations.dart';
+import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -17,26 +18,61 @@ class _SignupScreenState extends State<SignupScreen> {
   final _districtController = TextEditingController();
   final _villageController = TextEditingController();
   
-  final String _errorMessage = '';
+  String _errorMessage = '';
   bool _isLoading = false;
+  final _authService = AuthService();
 
   void _handleSignup() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
       
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
-      
-      setState(() => _isLoading = false);
-      
-      if (mounted) {
+      try {
+        // Call real backend API
+        final response = await _authService.register(
+          name: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          password: '123456', // Default password for now
+          role: 'buyer',
+        );
+        
+        if (!mounted) return;
+        
+        setState(() => _isLoading = false);
+        
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.translate('registration_successful')),
+            content: Text(
+              response['message'] ?? 
+              AppLocalizations.of(context)!.translate('registration_successful')
+            ),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
           ),
         );
+        
+        // Navigate back to login screen
         Navigator.pop(context);
+        
+      } catch (e) {
+        if (!mounted) return;
+        
+        setState(() {
+          _isLoading = false;
+          _errorMessage = e.toString().replaceAll('Exception: ', '');
+        });
+        
+        // Also show error in snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_errorMessage),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
       }
     }
   }
