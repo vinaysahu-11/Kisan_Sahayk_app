@@ -1,0 +1,11 @@
+Analyzing fks_app...                                            
+
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\admin_delivery_partners_screen.dart:122:50 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\admin_delivery_partners_screen.dart:140:54 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\labour_partner\labour_application_status.dart:112:19 - use_build_context_synchronously
+   info - Library names are not necessary - lib\screens\labour_partner_screen.dart:1:9 - unnecessary_library_name
+   info - Unnecessary use of string interpolation - lib\screens\transport_partner\transport_wallet_screen.dart:67:38 - unnecessary_string_interpolations
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\transport_partner_registration_screen.dart:226:19 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\transport_partner_registration_screen.dart:227:19 - deprecated_member_use
+   info - Library names are not necessary - lib\screens\transport_partner_screen.dart:1:9 - unnecessary_library_name
+
