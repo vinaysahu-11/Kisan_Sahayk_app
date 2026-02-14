@@ -36,42 +36,74 @@ class TransportFareBreakdownScreen extends StatefulWidget {
 class _TransportFareBreakdownScreenState
     extends State<TransportFareBreakdownScreen> {
   final _bookingService = TransportBookingService();
-  late final FareBreakdown _fareBreakdown;
+  Map<String, dynamic>? _fareBreakdown;
   bool _isBooking = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fareBreakdown = _bookingService.calculateFare(
-      distance: widget.distance,
-      ratePerKm: widget.vehicleInfo.ratePerKm,
-      minimumFare: widget.vehicleInfo.minimumFare,
-    );
+    _calculateFare();
+  }
+
+  Future<void> _calculateFare() async {
+    try {
+      final fare = await _bookingService.calculateFare(
+        vehicleType: widget.vehicleInfo.type.name,
+        distance: widget.distance,
+        loadWeight: widget.loadWeightTon,
+      );
+      setState(() {
+        _fareBreakdown = fare;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Calculate fare error: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _confirmBooking() async {
+    if (_fareBreakdown == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.translate('fare_calculation_failed')),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isBooking = true);
 
     try {
-      final booking = await _bookingService.createBooking(
-        userId: 'USER001',
-        userName: 'Ramesh Kumar',
-        userPhone: '9876543210',
-        pickupLocation: widget.pickupLocation,
-        dropLocation: widget.dropLocation,
-        vehicleType: widget.vehicleInfo.type,
-        loadType: widget.loadType,
-        loadWeightTon: widget.loadWeightTon,
-        loadNotes: widget.loadNotes,
-        bookingType: widget.bookingType,
-        scheduledTime: widget.scheduledTime,
+      final result = await _bookingService.createBooking(
+        vehicleType: widget.vehicleInfo.type.name,
+        loadType: widget.loadType.name,
+        loadWeight: widget.loadWeightTon,
+        pickupLocation: {
+          'latitude': widget.pickupLocation.latitude,
+          'longitude': widget.pickupLocation.longitude,
+          'address': widget.pickupLocation.address,
+        },
+        dropLocation: {
+          'latitude': widget.dropLocation.latitude,
+          'longitude': widget.dropLocation.longitude,
+          'address': widget.dropLocation.address,
+        },
+        distance: widget.distance,
+        scheduledDate: widget.scheduledTime?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        fare: _fareBreakdown!,
+        notes: widget.loadNotes,
       );
 
       if (mounted) {
         // Navigate to active booking screen
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (_) => TransportActiveBookingScreen(booking: booking),
+            builder: (_) => TransportActiveBookingScreen(
+              booking: TransportBooking.fromJson(result['booking']),
+            ),
           ),
           (route) => route.isFirst,
         );
@@ -92,6 +124,17 @@ class _TransportFareBreakdownScreenState
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    
+    if (_isLoading || _fareBreakdown == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(loc.translate('confirm_booking')),
+          elevation: 0,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.translate('confirm_booking')),
@@ -212,39 +255,20 @@ class _TransportFareBreakdownScreenState
                       children: [
                         _FareRow(
                           label: 'Base Fare',
-                          value:
-                              '${_fareBreakdown.distance.toStringAsFixed(1)} km × ₹${_fareBreakdown.ratePerKm.toStringAsFixed(0)}',
-                          amount: _fareBreakdown.baseFare,
+                          value: '${widget.distance.toStringAsFixed(1)} km × ₹${(_fareBreakdown!['baseFare'] ?? 0).toStringAsFixed(0)}',
+                          amount: (_fareBreakdown!['baseFare'] ?? 0).toDouble(),
                         ),
-                        if (_fareBreakdown.actualFare ==
-                            _fareBreakdown.minimumFare) ...[
-                          const Divider(height: 16),
-                          _FareRow(
-                            label: 'Minimum Fare Applied',
-                            value: '',
-                            amount: _fareBreakdown.minimumFare,
-                            color: Colors.orange,
-                          ),
-                        ],
                         const Divider(height: 16),
                         _FareRow(
-                          label: 'Platform Fee',
-                          value: '(5%)',
-                          amount: _fareBreakdown.platformFee,
+                          label: 'GST',
+                          value: '',
+                          amount: (_fareBreakdown!['gst'] ?? 0).toDouble(),
                         ),
-                        if (_fareBreakdown.gst > 0) ...[
-                          const Divider(height: 16),
-                          _FareRow(
-                            label: 'GST',
-                            value: '',
-                            amount: _fareBreakdown.gst,
-                          ),
-                        ],
                         const Divider(height: 16, thickness: 2),
                         _FareRow(
                           label: 'Total Amount',
                           value: '',
-                          amount: _fareBreakdown.totalFare,
+                          amount: (_fareBreakdown!['totalFare'] ?? 0).toDouble(),
                           isBold: true,
                           color: const Color(0xFF2E7D32),
                         ),
@@ -313,7 +337,7 @@ class _TransportFareBreakdownScreenState
                       ),
                     ),
                     Text(
-                      '₹${_fareBreakdown.totalFare.toStringAsFixed(0)}',
+                      '₹${(_fareBreakdown!['totalFare'] ?? 0).toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,

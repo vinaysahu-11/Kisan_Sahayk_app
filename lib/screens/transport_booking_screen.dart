@@ -3,7 +3,6 @@ import '../utils/app_localizations.dart';
 import '../models/transport_models.dart';
 import '../services/transport_booking_service.dart';
 import 'transport_vehicle_selection_screen.dart';
-import 'transport_active_booking_screen.dart';
 
 class TransportBookingScreen extends StatefulWidget {
   const TransportBookingScreen({super.key});
@@ -13,7 +12,6 @@ class TransportBookingScreen extends StatefulWidget {
 }
 
 class _TransportBookingScreenState extends State<TransportBookingScreen> {
-  final _bookingService = TransportBookingService();
   Location? _pickupLocation;
   Location? _dropLocation;
   double? _distance;
@@ -28,19 +26,8 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
   Future<void> _checkActiveBooking() async {
     setState(() => _isLoading = true);
     
-    // Check if user has an active booking
-    final activeBooking = _bookingService.getActiveBooking('USER001');
-    
-    if (activeBooking != null && mounted) {
-      // Navigate to active booking screen
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => TransportActiveBookingScreen(booking: activeBooking),
-        ),
-      );
-      return;
-    }
-    
+    // Check if user has an active booking by querying backend
+    // For now, just skip to normal flow
     setState(() => _isLoading = false);
   }
 
@@ -67,8 +54,12 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
 
   void _calculateDistance() {
     if (_pickupLocation != null && _dropLocation != null) {
-      final distance =
-          _bookingService.calculateDistance(_pickupLocation!, _dropLocation!);
+      final distance = TransportBookingService.calculateDistance(
+        _pickupLocation!.latitude,
+        _pickupLocation!.longitude,
+        _dropLocation!.latitude,
+        _dropLocation!.longitude,
+      );
       setState(() {
         _distance = distance;
       });

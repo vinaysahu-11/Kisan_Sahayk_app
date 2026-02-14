@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import '../utils/http_client.dart';
 import '../config/api_config.dart';
@@ -9,16 +8,13 @@ class TransportBookingService {
   factory TransportBookingService() => _instance;
   TransportBookingService._internal();
 
-  final HttpClient _httpClient = HttpClient();
-
   // Get vehicle types from backend
   Future<List<Map<String, dynamic>>> getVehicleTypes() async {
     try {
-      final response = await _httpClient.get(
+      final data = await HttpClient.get(
         '${ApiConfig.transportEndpoint}/vehicle-types',
       );
 
-      final data = json.decode(response.body);
       return List<Map<String, dynamic>>.from(data['vehicleTypes']);
     } catch (e) {
       print('Get vehicle types error: $e');
@@ -33,7 +29,7 @@ class TransportBookingService {
     double? loadWeight,
   }) async {
     try {
-      final response = await _httpClient.post(
+      final data = await HttpClient.post(
         '${ApiConfig.transportEndpoint}/calculate-fare',
         {
           'vehicleType': vehicleType,
@@ -42,7 +38,6 @@ class TransportBookingService {
         },
       );
 
-      final data = json.decode(response.body);
       return {
         'vehicleType': data['vehicleType'],
         'distance': data['distance'],
@@ -70,7 +65,7 @@ class TransportBookingService {
     bool payNow = false,
   }) async {
     try {
-      final response = await _httpClient.post(
+      final data = await HttpClient.post(
         '${ApiConfig.transportEndpoint}/bookings',
         {
           'vehicleType': vehicleType,
@@ -86,7 +81,6 @@ class TransportBookingService {
         },
       );
 
-      final data = json.decode(response.body);
       return {
         'message': data['message'],
         'booking': data['booking'],
@@ -109,9 +103,8 @@ class TransportBookingService {
         url += '&status=$status';
       }
 
-      final response = await _httpClient.get(url);
+      final data = await HttpClient.get(url);
 
-      final data = json.decode(response.body);
       return {
         'bookings': data['bookings'],
         'pagination': data['pagination'],
@@ -125,11 +118,10 @@ class TransportBookingService {
   // Get booking details
   Future<Map<String, dynamic>> getBookingById(String bookingId) async {
     try {
-      final response = await _httpClient.get(
+      final data = await HttpClient.get(
         '${ApiConfig.transportEndpoint}/bookings/$bookingId',
       );
 
-      final data = json.decode(response.body);
       return {'booking': data['booking']};
     } catch (e) {
       print('Get booking details error: $e');
@@ -143,12 +135,11 @@ class TransportBookingService {
     String reason,
   ) async {
     try {
-      final response = await _httpClient.put(
+      final data = await HttpClient.put(
         '${ApiConfig.transportEndpoint}/bookings/$bookingId/cancel',
         {'reason': reason},
       );
 
-      final data = json.decode(response.body);
       return {
         'message': data['message'],
         'booking': data['booking'],
@@ -166,7 +157,7 @@ class TransportBookingService {
     String? review,
   }) async {
     try {
-      final response = await _httpClient.post(
+      final data = await HttpClient.post(
         '${ApiConfig.transportEndpoint}/bookings/$bookingId/rate',
         {
           'rating': rating,
@@ -174,7 +165,6 @@ class TransportBookingService {
         },
       );
 
-      final data = json.decode(response.body);
       return {
         'message': data['message'],
         'rating': data['rating'],
@@ -191,12 +181,11 @@ class TransportBookingService {
     String status,
   ) async {
     try {
-      final response = await _httpClient.put(
+      final data = await HttpClient.put(
         '${ApiConfig.transportEndpoint}/bookings/$bookingId/status',
         {'status': status},
       );
 
-      final data = json.decode(response.body);
       return {
         'message': data['message'],
         'booking': data['booking'],
@@ -219,9 +208,8 @@ class TransportBookingService {
         url += '&vehicleType=$vehicleType';
       }
 
-      final response = await _httpClient.get(url);
+      final data = await HttpClient.get(url);
 
-      final data = json.decode(response.body);
       return {
         'partners': data['partners'],
         'pagination': data['pagination'],

@@ -26,6 +26,31 @@ class _TransportVehicleSelectionScreenState
   final _bookingService = TransportBookingService();
   VehicleType? _selectedVehicle;
   final List<VehicleInfo> _vehicles = VehicleInfo.getAvailableVehicles();
+  final Map<VehicleType, Map<String, dynamic>> _fareCache = {};
+  bool _isLoadingFares = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _preCalculateFares();
+  }
+
+  Future<void> _preCalculateFares() async {
+    setState(() => _isLoadingFares = true);
+    for (var vehicle in _vehicles) {
+      try {
+        final fare = await _bookingService.calculateFare(
+          vehicleType: vehicle.type.name,
+          distance: widget.distance,
+          loadWeight: 0.5, // Default weight for estimation
+        );
+        _fareCache[vehicle.type] = fare;
+      } catch (e) {
+        print('Error calculating fare for ${vehicle.type}: $e');
+      }
+    }
+    setState(() => _isLoadingFares = false);
+  }
 
   void _selectVehicle(VehicleType type) {
     setState(() {
@@ -121,29 +146,27 @@ class _TransportVehicleSelectionScreenState
 
           // Vehicle list
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = _vehicles[index];
-                final fare = _bookingService.calculateFare(
-                  distance: widget.distance,
-                  ratePerKm: vehicle.ratePerKm,
-                  minimumFare: vehicle.minimumFare,
-                );
-                final isSelected = _selectedVehicle == vehicle.type;
+            child: _isLoadingFares
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _vehicles.length,
+                    itemBuilder: (context, index) {
+                      final vehicle = _vehicles[index];
+                      final fare = _fareCache[vehicle.type];
+                      final isSelected = _selectedVehicle == vehicle.type;
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _VehicleCard(
-                    vehicle: vehicle,
-                    fare: fare,
-                    isSelected: isSelected,
-                    onTap: () => _selectVehicle(vehicle.type),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _VehicleCard(
+                          vehicle: vehicle,
+                          fare: fare,
+                          isSelected: isSelected,
+                          onTap: () => _selectVehicle(vehicle.type),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
 
           // Continue button
@@ -191,7 +214,7 @@ class _TransportVehicleSelectionScreenState
 
 class _VehicleCard extends StatelessWidget {
   final VehicleInfo vehicle;
-  final FareBreakdown fare;
+  final Map<String, dynamic>? fare;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -305,7 +328,9 @@ class _VehicleCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '₹${fare.totalFare.toStringAsFixed(0)}',
+                          fare != null 
+                              ? '₹${(fare!['totalFare'] ?? 0).toStringAsFixed(0)}'
+                              : '₹---',
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
@@ -313,7 +338,8 @@ class _VehicleCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        if (fare.actualFare == fare.minimumFare)
+                        if (fare != null && 
+                            (fare!['baseFare'] ?? 0) == vehicle.minimumFare)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,

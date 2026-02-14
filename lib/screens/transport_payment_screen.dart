@@ -27,23 +27,31 @@ class _TransportPaymentScreenState extends State<TransportPaymentScreen> {
     // Simulate payment processing
     await Future.delayed(const Duration(seconds: 2));
 
-    _bookingService.completePayment(
-      widget.booking.bookingId,
-      _selectedMethod,
-      PaymentStatus.completed,
-    );
-
-    _bookingService.updateBookingStatus(
-      widget.booking.bookingId,
-      BookingStatus.completed,
-    );
-
-    if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => TransportRatingScreen(booking: widget.booking),
-        ),
+    // Update booking status to completed
+    try {
+      await _bookingService.updateBookingStatus(
+        widget.booking.bookingId,
+        'completed',
       );
+
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => TransportRatingScreen(booking: widget.booking),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Payment error: $e');
+      setState(() => _isProcessing = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('payment_failed')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

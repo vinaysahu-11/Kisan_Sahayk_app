@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/delivery_service.dart';
+import '../theme/app_colors.dart';
 import '../utils/app_localizations.dart';
 
 class DeliveryWalletScreen extends StatefulWidget {
@@ -98,12 +99,8 @@ class _DeliveryWalletScreenState extends State<DeliveryWalletScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+            decoration: BoxDecoration(
+              gradient: AppColors.accentGradient(context),
             ),
             child: Column(
               children: [

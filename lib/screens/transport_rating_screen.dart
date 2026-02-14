@@ -40,24 +40,22 @@ class _TransportRatingScreenState extends State<TransportRatingScreen> {
 
     setState(() => _isSubmitting = true);
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await _bookingService.ratePartner(
+        bookingId: widget.booking.bookingId,
+        rating: _rating.toInt(),
+        review: _reviewController.text.isNotEmpty ? _reviewController.text : null,
+      );
 
-    _bookingService.submitRating(
-      widget.booking.bookingId,
-      _rating,
-      _reviewController.text,
-    );
-
-    if (mounted) {
-      // Show success dialog
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+      if (mounted) {
+        // Show success dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: const BoxDecoration(
@@ -111,6 +109,18 @@ class _TransportRatingScreenState extends State<TransportRatingScreen> {
           ],
         ),
       );
+      }
+    } catch (e) {
+      print('Rating error: $e');
+      setState(() => _isSubmitting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.translate('rating_failed')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

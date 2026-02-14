@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 import '../../utils/app_localizations.dart';
 
 class TransportWalletScreen extends StatelessWidget {
@@ -22,9 +23,7 @@ class TransportWalletScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
-                ),
+                gradient: AppColors.accentGradient(context),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(

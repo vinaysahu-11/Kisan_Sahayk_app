@@ -385,9 +385,37 @@ class _LabourPartnerRegistrationScreenState
   }
 
   void _onStepContinue() {
-    if (_currentStep == 0 && !_validateStep0()) return;
-    if (_currentStep == 1 && !_validateStep1()) return;
-    if (_currentStep == 2 && !_validateStep2()) return;
+    // Validate current step
+    bool isValid = false;
+    
+    if (_currentStep == 0) {
+      isValid = _validateStep0();
+      if (!isValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please fill all required fields in Personal Details'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    } else if (_currentStep == 1) {
+      isValid = _validateStep1();
+      if (!isValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please fill all required fields in Bank Details'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    } else if (_currentStep == 2) {
+      isValid = _validateStep2();
+      if (!isValid) {
+        return; // Error message already shown in _validateStep2
+      }
+    }
 
     if (_currentStep < 3) {
       setState(() {
@@ -407,21 +435,30 @@ class _LabourPartnerRegistrationScreenState
   }
 
   bool _validateStep0() {
-    return _formKey.currentState!.validate();
+    // Trigger validation on all form fields and show error messages
+    final isValid = _formKey.currentState?.validate() ?? false;
+    return isValid;
   }
 
   bool _validateStep1() {
-    return _formKey.currentState!.validate();
+    // Trigger validation on all form fields and show error messages
+    final isValid = _formKey.currentState?.validate() ?? false;
+    return isValid;
   }
 
   bool _validateStep2() {
     if (_selectedSkills.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.translate('select_at_least_one_skill'))),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.translate('select_at_least_one_skill')),
+          backgroundColor: Colors.red,
+        ),
       );
       return false;
     }
-    return _formKey.currentState!.validate();
+    // Trigger validation on all form fields and show error messages
+    final isValid = _formKey.currentState?.validate() ?? false;
+    return isValid;
   }
 
   void _setDefaultWage(LabourSkillType skill) {

@@ -46,7 +46,6 @@ class _LabourBookingDetailsScreenState
         workersCount: _workersCount,
         wagePerWorker: _wagePerWorker,
         duration: _selectedDuration,
-        paymentOption: _paymentOption,
       );
     });
   }

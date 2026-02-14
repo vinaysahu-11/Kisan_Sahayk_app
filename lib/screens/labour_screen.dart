@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_localizations.dart';
 import 'labour_skill_selection_screen.dart';
 import 'labour_partner/labour_partner_dashboard.dart';
+import '../theme/app_colors.dart';
 
 class LabourScreen extends StatelessWidget {
   const LabourScreen({super.key});
@@ -15,12 +16,8 @@ class LabourScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF2E7D32),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAF8), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

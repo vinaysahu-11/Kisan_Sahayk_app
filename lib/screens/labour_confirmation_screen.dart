@@ -408,17 +408,14 @@ class _LabourConfirmationScreenState extends State<LabourConfirmationScreen> {
     if (confirmed == true) {
       // Create booking
       final booking = await _bookingService.createBooking(
-        farmerId: 'FARMER001',
-        farmerName: 'Current User',
-        farmerPhone: '9876543210',
-        labourType: widget.skillType,
-        workersRequired: widget.workersCount,
-        workDate: widget.workDate,
-        duration: widget.duration,
-        wagePerWorker: widget.wagePerWorker,
-        workLocation: widget.workLocation,
-        workNotes: widget.workNotes,
-        paymentOption: widget.paymentOption,
+        skill: widget.skillType.name,
+        workType: '', // Add workType if needed
+        labourRequired: widget.workersCount,
+        date: widget.workDate.toIso8601String(),
+        duration: widget.duration == WorkDuration.fullDay ? 1.0 : 0.5,
+        description: widget.workNotes ?? '',
+        location: widget.workLocation.toJson(),
+        budget: widget.wagePerWorker,
       );
 
       // Navigate to active booking
@@ -427,7 +424,7 @@ class _LabourConfirmationScreenState extends State<LabourConfirmationScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => LabourActiveBookingScreen(
-              bookingId: booking.bookingId,
+              bookingId: booking['booking']['_id'],
             ),
           ),
         );

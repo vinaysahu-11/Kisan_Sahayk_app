@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_localizations.dart';
 import 'transport_partner/transport_partner_dashboard.dart';
+import '../theme/app_colors.dart';
 
 class TransportScreen extends StatelessWidget {
   const TransportScreen({super.key});
@@ -14,12 +15,8 @@ class TransportScreen extends StatelessWidget {
         elevation: 0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAF8), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SafeArea(
           child: Padding(
@@ -56,9 +53,7 @@ class TransportScreen extends StatelessWidget {
                   icon: Icons.local_shipping_rounded,
                   title: loc.translate('book_transport'),
                   subtitle: loc.translate('transport_services'),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2E7D32), Color(0xFF4CAF50)],
-                  ),
+                  gradient: AppColors.primaryGradient(context),
                   onTap: () {
                     Navigator.pushNamed(context, '/transport-booking');
                   },
@@ -71,9 +66,7 @@ class TransportScreen extends StatelessWidget {
                   icon: Icons.dashboard_rounded,
                   title: loc.translate('partner_dashboard'),
                   subtitle: loc.translate('partner_dashboard'),
-                  gradient: LinearGradient(
-                    colors: [Colors.orange[700]!, Colors.deepOrange],
-                  ),
+                  gradient: AppColors.accentGradient(context),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(

@@ -3,6 +3,11 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
+const authController = require('../controllers/authController');
+const { authMiddleware } = require('../middleware/auth');
+
+// Alias authMiddleware as protect for authController
+const protect = authMiddleware;
 
 // Register
 router.post('/register', [
@@ -133,5 +138,9 @@ router.post('/send-otp', [
     res.status(500).json({ error: 'Failed to send OTP', message: error.message });
   }
 });
+
+// User Preferences Routes
+router.put('/preferences', protect, authController.updatePreferences);
+router.get('/preferences', protect, authController.getPreferences);
 
 module.exports = router;

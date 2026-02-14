@@ -39,12 +39,16 @@ class _LabourRatingScreenState extends State<LabourRatingScreen> {
     _loadBooking();
   }
 
-  void _loadBooking() {
-    final booking = _bookingService.getBookingById(widget.bookingId);
-    if (booking != null) {
-      setState(() {
-        _booking = booking;
-      });
+  void _loadBooking() async {
+    try {
+      final result = await _bookingService.getBookingById(widget.bookingId);
+      if (result['booking'] != null) {
+        setState(() {
+          _booking = LabourBooking.fromJson(result['booking']);
+        });
+      }
+    } catch (e) {
+      print('Error loading booking: $e');
     }
   }
 
@@ -353,9 +357,9 @@ class _LabourRatingScreenState extends State<LabourRatingScreen> {
 
     // Submit rating
     _bookingService.submitRating(
-      widget.bookingId,
-      _rating,
-      fullReview,
+      bookingId: widget.bookingId,
+      rating: _rating.toInt(),
+      review: fullReview.isNotEmpty ? fullReview : null,
     );
 
     // Show success dialog

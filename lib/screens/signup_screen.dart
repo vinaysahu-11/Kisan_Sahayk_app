@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utils/app_localizations.dart';
 import '../services/auth_service.dart';
+import '../theme/app_colors.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -82,12 +83,8 @@ class _SignupScreenState extends State<SignupScreen> {
     final loc = AppLocalizations.of(context)!;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFE8F5E9), Color(0xFFF1F8F4), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SafeArea(
           child: SingleChildScrollView(

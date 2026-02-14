@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 import '../../utils/app_localizations.dart';
 import '../labour_wallet_screen.dart';
 
@@ -132,9 +133,7 @@ class _LabourPartnerDashboardScreenState extends State<LabourPartnerDashboardScr
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
-                      ),
+                      gradient: AppColors.accentGradient(context),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(

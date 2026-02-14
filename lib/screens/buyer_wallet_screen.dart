@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/buyer_service.dart';
+import '../theme/app_colors.dart';
 
 class BuyerWalletScreen extends StatelessWidget {
   const BuyerWalletScreen({super.key});
@@ -20,7 +21,7 @@ class BuyerWalletScreen extends StatelessWidget {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF2E7D32), Color(0xFF43A047)]),
+              gradient: AppColors.accentGradient(context),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(

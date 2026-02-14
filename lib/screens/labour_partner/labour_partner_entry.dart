@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 import '../../utils/app_localizations.dart';
 import 'labour_otp_registration.dart';
 
@@ -14,10 +15,8 @@ class LabourPartnerEntry extends StatelessWidget {
         title: Text(loc.translate('become_labour_partner'), style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
-            ),
+          decoration: BoxDecoration(
+            gradient: AppColors.accentGradient(context),
           ),
         ),
       ),

@@ -4,7 +4,6 @@ import '../utils/app_localizations.dart';
 import '../models/transport_models.dart';
 import '../services/transport_booking_service.dart';
 import '../services/live_tracking_service.dart';
-import 'transport_payment_screen.dart';
 
 
 class TransportActiveBookingScreen extends StatefulWidget {
@@ -37,23 +36,14 @@ class _TransportActiveBookingScreenState
   }
 
   void _subscribeToUpdates() {
-    // Subscribe to booking updates
-    _bookingSubscription = _bookingService.bookingUpdates.listen((booking) {
-      if (booking.bookingId == _currentBooking.bookingId) {
-        setState(() => _currentBooking = booking);
-
-        // Start tracking when driver is assigned
-        if (booking.status == BookingStatus.driverAssigned &&
-            booking.assignedPartner != null) {
-          _startTracking();
-        }
-
-        // Navigate to payment when delivered
-        if (booking.status == BookingStatus.delivered) {
-          _navigateToPayment();
-        }
-      }
-    });
+    // For now, just keep the current booking state
+    // In production, implement WebSocket or polling for real-time updates
+    
+    // Start tracking when driver is assigned
+    if (_currentBooking.status == BookingStatus.driverAssigned &&
+        _currentBooking.assignedPartner != null) {
+      _startTracking();
+    }
   }
 
   void _startTracking() {
@@ -74,16 +64,8 @@ class _TransportActiveBookingScreenState
     }
   }
 
-  void _navigateToPayment() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => TransportPaymentScreen(booking: _currentBooking),
-      ),
-    );
-  }
-
   void _simulateStatusChange(BookingStatus newStatus) {
-    _bookingService.updateBookingStatus(_currentBooking.bookingId, newStatus);
+    _bookingService.updateBookingStatus(_currentBooking.bookingId, newStatus.name);
   }
 
   void _cancelBooking() {
@@ -103,7 +85,7 @@ class _TransportActiveBookingScreenState
             onPressed: () {
               _bookingService.updateBookingStatus(
                 _currentBooking.bookingId,
-                BookingStatus.cancelled,
+                'cancelled',
               );
               Navigator.of(context).popUntil((route) => route.isFirst);
             },

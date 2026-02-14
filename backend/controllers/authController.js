@@ -364,3 +364,55 @@ exports.deleteAddress = async (req, res) => {
     });
   }
 };
+
+/**
+ * Update user preferences (language, dark mode, notifications)
+ */
+exports.updatePreferences = async (req, res) => {
+  try {
+    const { language, darkMode, notifications } = req.body;
+
+    const updateFields = {};
+    if (language !== undefined) updateFields['preferences.language'] = language;
+    if (darkMode !== undefined) updateFields['preferences.darkMode'] = darkMode;
+    if (notifications !== undefined) updateFields['preferences.notifications'] = notifications;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    ).select('-password -otp');
+
+    res.json({
+      success: true,
+      message: 'Preferences updated successfully',
+      preferences: user.preferences
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update preferences', 
+      error: error.message 
+    });
+  }
+};
+
+/**
+ * Get user preferences
+ */
+exports.getPreferences = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('preferences');
+
+    res.json({
+      success: true,
+      preferences: user.preferences
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to get preferences', 
+      error: error.message 
+    });
+  }
+};

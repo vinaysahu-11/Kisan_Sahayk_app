@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'buyer_home_screen.dart';
+import '../theme/app_colors.dart';
 
 class BuyProductScreen extends StatelessWidget {
   const BuyProductScreen({super.key});
@@ -11,18 +12,14 @@ class BuyProductScreen extends StatelessWidget {
         title: const Text('Buy Products', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)]),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient(context),
           ),
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAF8), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -38,7 +35,7 @@ class BuyProductScreen extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Color(0xFF2E7D32), Color(0xFF43A047)]),
+                    gradient: AppColors.primaryGradient(context),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [BoxShadow(color: Colors.green.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 4))],
                   ),

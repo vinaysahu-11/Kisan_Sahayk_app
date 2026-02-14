@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import '../config/api_config.dart';
 import '../utils/token_storage.dart';
 
@@ -128,5 +126,69 @@ class AuthService {
   /// Logout
   Future<void> logout() async {
     await TokenStorage.clearAll();
+  }
+
+  /// Update user preferences (language, darkMode, notifications)
+  Future<Map<String, dynamic>> updatePreferences({
+    String? language,
+    bool? darkMode,
+    Map<String, dynamic>? notifications,
+  }) async {
+    try {
+      final token = await TokenStorage.getToken();
+      if (token == null) throw Exception('Not authenticated');
+
+      final url = Uri.parse('${ApiConfig.authEndpoint}/preferences');
+      
+      final body = <String, dynamic>{};
+      if (language != null) body['language'] = language;
+      if (darkMode != null) body['darkMode'] = darkMode;
+      if (notifications != null) body['notifications'] = notifications;
+
+      final response = await http.put(
+        url,
+        headers: {
+          ...ApiConfig.headers,
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(body),
+      ).timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to update preferences');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Network error: $e');
+    }
+  }
+
+  /// Get user preferences
+  Future<Map<String, dynamic>> getPreferences() async {
+    try {
+      final token = await TokenStorage.getToken();
+      if (token == null) throw Exception('Not authenticated');
+
+      final url = Uri.parse('${ApiConfig.authEndpoint}/preferences');
+      
+      final response = await http.get(
+        url,
+        headers: {
+          ...ApiConfig.headers,
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to get preferences');
+      }
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Network error: $e');
+    }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 
 class ProfileScreen extends StatelessWidget {
@@ -11,20 +12,14 @@ class ProfileScreen extends StatelessWidget {
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-            ),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient(context),
           ),
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAF8), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

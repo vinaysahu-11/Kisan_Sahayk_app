@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import '../models/labour_models.dart';
 import '../services/labour_booking_service.dart';
 import '../utils/app_localizations.dart';
-import 'labour_payment_screen.dart';
 
 class LabourActiveBookingScreen extends StatefulWidget {
   final String bookingId;
@@ -33,39 +32,42 @@ class _LabourActiveBookingScreenState
   }
 
   void _loadBooking() {
-    final booking = _bookingService.getBookingById(widget.bookingId);
-    if (booking != null) {
-      setState(() {
-        _booking = booking;
-      });
-    }
+    _bookingService.getBookingById(widget.bookingId).then((result) {
+      if (result['booking'] != null) {
+        setState(() {
+          _booking = LabourBooking.fromJson(result['booking']);
+        });
+      }
+    });
   }
 
   void _listenToUpdates() {
-    _bookingSubscription =
-        _bookingService.bookingUpdates.listen((updatedBooking) {
-      if (updatedBooking.bookingId == widget.bookingId) {
-        setState(() {
-          _booking = updatedBooking;
-        });
+    // TODO: Implement real-time updates using WebSocket or polling
+    // For now, we'll just refresh periodically
+    // _bookingSubscription =
+    //     _bookingService.bookingUpdates.listen((updatedBooking) {
+    //   if (updatedBooking.bookingId == widget.bookingId) {
+    //     setState(() {
+    //       _booking = updatedBooking;
+    //     });
 
-        // Auto navigate to payment when work is completed
-        if (updatedBooking.status == LabourBookingStatus.workCompleted) {
-          Future.delayed(const Duration(seconds: 2), () {
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LabourPaymentScreen(
-                    bookingId: widget.bookingId,
-                  ),
-                ),
-              );
-            }
-          });
-        }
-      }
-    });
+    //     // Auto navigate to payment when work is completed
+    //     if (updatedBooking.status == LabourBookingStatus.workCompleted) {
+    //       Future.delayed(const Duration(seconds: 2), () {
+    //         if (mounted) {
+    //           Navigator.pushReplacement(
+    //             context,
+    //             MaterialPageRoute(
+    //               builder: (context) => LabourPaymentScreen(
+    //                 bookingId: widget.bookingId,
+    //               ),
+    //             ),
+    //           );
+    //         }
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -436,7 +438,7 @@ class _LabourActiveBookingScreenState
                     label: 'Start Work',
                     onPressed: () => _bookingService.updateBookingStatus(
                       widget.bookingId,
-                      LabourBookingStatus.workStarted,
+                      LabourBookingStatus.workStarted.name,
                     ),
                   ),
                 if (_booking!.status == LabourBookingStatus.workStarted)
@@ -444,7 +446,7 @@ class _LabourActiveBookingScreenState
                     label: 'Complete Work',
                     onPressed: () => _bookingService.updateBookingStatus(
                       widget.bookingId,
-                      LabourBookingStatus.workCompleted,
+                      LabourBookingStatus.workCompleted.name,
                     ),
                   ),
                 _DemoButton(

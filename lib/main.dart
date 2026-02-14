@@ -7,7 +7,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'utils/app_localizations.dart';
 import 'providers/language_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fks_app/screens/login_screen.dart';
 import 'package:fks_app/screens/signup_screen.dart';
 import 'package:fks_app/screens/buy_product_screen.dart';
@@ -30,6 +29,7 @@ import 'package:fks_app/screens/admin_category_screen.dart';
 import 'package:fks_app/screens/admin_seller_screen.dart';
 import 'package:fks_app/widgets/auth_wrapper.dart';
 import 'providers/theme_provider.dart';
+import 'package:fks_app/screens/ai_assistant_screen.dart';
 import 'package:fks_app/screens/buyer_home_screen.dart';
 import 'package:fks_app/screens/buyer_product_list_screen.dart';
 import 'package:fks_app/screens/buyer_product_detail_screen.dart';
@@ -148,22 +148,58 @@ class _MainAppState extends State<MainApp> {
           brightness: Brightness.light,
         ),
         fontFamily: 'Roboto',
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF2E6B3F),
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        cardTheme: CardThemeData(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          color: Colors.white,
+        ),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
+        brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF2E6B3F),
           brightness: Brightness.dark,
+          surface: const Color(0xFF1E1E1E),
+          background: const Color(0xFF121212),
         ),
         fontFamily: 'Roboto',
         scaffoldBackgroundColor: const Color(0xFF121212),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF1F1F1F),
           foregroundColor: Colors.white,
+          elevation: 0,
         ),
-        cardColor: const Color(0xFF1E1E1E),
+        cardTheme: CardThemeData(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          color: const Color(0xFF1E1E1E),
+        ),
         drawerTheme: const DrawerThemeData(
           backgroundColor: Color(0xFF1E1E1E),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF1F1F1F),
+          selectedItemColor: Color(0xFF4CAF50),
+          unselectedItemColor: Colors.white70,
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: const Color(0xFF1E1E1E),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF2A2A2A),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Color(0xFF404040)),
+          ),
         ),
       ),
       home: const AuthWrapper(),
@@ -190,6 +226,7 @@ class _MainAppState extends State<MainApp> {
         '/settings': (context) => const SettingsScreen(),
         '/help': (context) => const HelpScreen(),
         '/about': (context) => const AboutScreen(),
+        '/ai-assistant': (context) => const AiAssistantScreen(),
         '/seller-login': (context) => const SellerLoginScreen(),
         '/admin-categories': (context) => const AdminCategoryScreen(),
         '/admin-sellers': (context) => const AdminSellerScreen(),

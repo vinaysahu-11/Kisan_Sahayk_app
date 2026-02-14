@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../screens/login_screen.dart';
 import '../screens/main_wrapper_screen.dart';
 // If you have an AuthProvider, import it here
@@ -14,7 +13,7 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     // Replace with your actual auth provider logic
     // final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
-    final isLoggedIn = false; // TODO: Replace with real auth state
+    const isLoggedIn = false; // TODO: Replace with real auth state
     return isLoggedIn ? const MainWrapperScreen() : const LoginScreen();
   }
 }

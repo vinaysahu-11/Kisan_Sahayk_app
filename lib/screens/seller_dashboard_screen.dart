@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/seller_models.dart';
 import '../services/seller_service.dart';
+import '../theme/app_colors.dart';
 import '../utils/app_localizations.dart';
 import 'add_product_screen.dart';
 import 'seller_orders_screen.dart';
@@ -265,9 +266,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2E7D32), Color(0xFF388E3C)],
-        ),
+        gradient: AppColors.accentGradient(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

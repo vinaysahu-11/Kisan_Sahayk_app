@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_localizations.dart';
+import '../theme/app_colors.dart';
 
 class SellProductScreen extends StatefulWidget {
   const SellProductScreen({super.key});
@@ -35,20 +36,14 @@ class _SellProductScreenState extends State<SellProductScreen> {
         title: Text(loc.translate('list_product'), style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-            ),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient(context),
           ),
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAF8), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -61,9 +56,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF2E7D32), Color(0xFF388E3C)],
-                    ),
+                    gradient: AppColors.primaryGradient(context),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(

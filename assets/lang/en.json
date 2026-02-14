@@ -1,7 +1,7 @@
 {
   "app_name": "Kisan Sahayk",
-  "tagline": "Digital Companion for Every Farmer",
-  "har_kisan_tagline": "Har Kisan Ka Digital Saathi",
+  "tagline": "Har Kisan Ka apna saathi",
+  "har_kisan_tagline": "Har Kisan Ka apna Saathi",
   "welcome": "Welcome",
   "choose_language": "Choose Your Language",
   "select_language_hint": "Tap a language to continue",
@@ -36,7 +36,6 @@
   "mobile_number": "Mobile Number",
   "enter_otp_hint": "Enter 6-digit OTP",
   "change_phone_number": "Change Phone Number",
-  "demo_credentials": "Demo: 9876543210 / 123456",
   "dashboard": "Dashboard",
   "home": "Home",
   "profile": "Profile",

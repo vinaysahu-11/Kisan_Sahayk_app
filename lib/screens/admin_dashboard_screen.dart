@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../theme/app_colors.dart';
 import '../utils/app_localizations.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -115,10 +116,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         title: Text(loc.translate('admin_dashboard'), style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-            ),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient(context),
           ),
         ),
       ),
@@ -133,9 +132,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-                      ),
+                      gradient: AppColors.primaryGradient(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(

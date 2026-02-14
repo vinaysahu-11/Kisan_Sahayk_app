@@ -28,12 +28,16 @@ class _LabourPaymentScreenState extends State<LabourPaymentScreen> {
     _loadBooking();
   }
 
-  void _loadBooking() {
-    final booking = _bookingService.getBookingById(widget.bookingId);
-    if (booking != null) {
-      setState(() {
-        _booking = booking;
-      });
+  void _loadBooking() async {
+    try {
+      final result = await _bookingService.getBookingById(widget.bookingId);
+      if (result['booking'] != null) {
+        setState(() {
+          _booking = LabourBooking.fromJson(result['booking']);
+        });
+      }
+    } catch (e) {
+      print('Error loading booking: $e');
     }
   }
 
@@ -289,15 +293,15 @@ class _LabourPaymentScreenState extends State<LabourPaymentScreen> {
     await Future.delayed(const Duration(seconds: 2));
 
     // Update payment status
-    _bookingService.updatePaymentStatus(
+    await _bookingService.updatePaymentStatus(
       widget.bookingId,
       PaymentStatus.completed,
     );
 
     // Update booking status to payment released
-    _bookingService.updateBookingStatus(
+    await _bookingService.updateBookingStatus(
       widget.bookingId,
-      LabourBookingStatus.paymentReleased,
+      LabourBookingStatus.paymentReleased.name,
     );
 
     setState(() {

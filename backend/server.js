@@ -62,6 +62,7 @@ const transportRoutes = require('./routes/transport_routes');
 const deliveryRoutes = require('./routes/delivery');
 const adminRoutes = require('./routes/admin');
 const weatherRoutes = require('./routes/weather');
+const aiRoutes = require('./routes/ai_routes');
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -72,6 +73,7 @@ app.use('/api/transport', transportRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/weather', weatherRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 Handler
 app.use(notFound);

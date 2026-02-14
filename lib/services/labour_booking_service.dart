@@ -1,6 +1,6 @@
-import 'dart:convert';
 import '../utils/http_client.dart';
 import '../config/api_config.dart';
+import '../models/labour_models.dart';
 
 class LabourBookingService {
   static final LabourBookingService _instance =
@@ -8,19 +8,63 @@ class LabourBookingService {
   factory LabourBookingService() => _instance;
   LabourBookingService._internal();
 
-  final HttpClient _httpClient = HttpClient();
+  // Calculate cost breakdown for a booking
+  LabourCostBreakdown calculateCost({
+    required int workersCount,
+    required double wagePerWorker,
+    required WorkDuration duration,
+  }) {
+    final subtotal = workersCount * wagePerWorker * (duration == WorkDuration.fullDay ? 1 : 0.5);
+    final platformFee = subtotal * 0.05;
+    final gst = subtotal * 0.18;
+    final totalCost = subtotal + platformFee + gst;
+    return LabourCostBreakdown(
+      workersCount: workersCount,
+      wagePerWorker: wagePerWorker,
+      duration: duration,
+      subtotal: subtotal,
+      platformFee: platformFee,
+      gst: gst,
+      totalCost: totalCost,
+      advanceAmount: null,
+      remainingAmount: null,
+    );
+  }
 
-  // Get available skills from backend
-  Future<List<String>> getSkills() async {
+  // Find available labour partners
+  Future<List<LabourPartner>> findAvailableLabour({
+    required LabourSkillType skillType,
+    required Location workLocation,
+    required DateTime workDate,
+    required int workersRequired,
+  }) async {
     try {
-      final response = await _httpClient.get(
-        '${ApiConfig.labourEndpoint}/skills',
+      final response = await HttpClient.get(
+        '${ApiConfig.labourEndpoint}/partners?skill=${skillType.name}&lat=${workLocation.latitude}&lng=${workLocation.longitude}&date=${workDate.toIso8601String()}&count=$workersRequired',
       );
-
-      final data = json.decode(response.body);
-      return List<String>.from(data['skills']);
+      final partners = (response['partners'] as List)
+          .map((p) => LabourPartner.fromJson(p))
+          .toList();
+      return partners;
     } catch (e) {
-      print('Get skills error: $e');
+      print('Find available labour error: $e');
+      rethrow;
+    }
+  }
+
+  // Update payment status
+  Future<Map<String, dynamic>> updatePaymentStatus(
+    String bookingId,
+    PaymentStatus status,
+  ) async {
+    try {
+      final response = await HttpClient.put(
+        '${ApiConfig.labourEndpoint}/bookings/$bookingId/payment',
+        {'status': status.name},
+      );
+      return response;
+    } catch (e) {
+      print('Update payment status error: $e');
       rethrow;
     }
   }
@@ -37,7 +81,7 @@ class LabourBookingService {
     required double budget,
   }) async {
     try {
-      final response = await _httpClient.post(
+      final response = await HttpClient.post(
         '${ApiConfig.labourEndpoint}/bookings',
         {
           'skill': skill,
@@ -50,12 +94,7 @@ class LabourBookingService {
           'budget': budget,
         },
       );
-
-      final data = json.decode(response.body);
-      return {
-        'message': data['message'],
-        'booking': data['booking'],
-      };
+      return response;
     } catch (e) {
       print('Create booking error: $e');
       rethrow;
@@ -74,13 +113,9 @@ class LabourBookingService {
         url += '&status=$status';
       }
 
-      final response = await _httpClient.get(url);
+        final response = await HttpClient.get(url);
 
-      final data = json.decode(response.body);
-      return {
-        'bookings': data['bookings'],
-        'pagination': data['pagination'],
-      };
+      return response;
     } catch (e) {
       print('Get bookings error: $e');
       rethrow;
@@ -90,12 +125,11 @@ class LabourBookingService {
   // Get booking details
   Future<Map<String, dynamic>> getBookingById(String bookingId) async {
     try {
-      final response = await _httpClient.get(
+        final response = await HttpClient.get(
         '${ApiConfig.labourEndpoint}/bookings/$bookingId',
       );
 
-      final data = json.decode(response.body);
-      return {'booking': data['booking']};
+      return response;
     } catch (e) {
       print('Get booking details error: $e');
       rethrow;
@@ -108,16 +142,12 @@ class LabourBookingService {
     String reason,
   ) async {
     try {
-      final response = await _httpClient.put(
+        final response = await HttpClient.put(
         '${ApiConfig.labourEndpoint}/bookings/$bookingId/cancel',
         {'reason': reason},
       );
 
-      final data = json.decode(response.body);
-      return {
-        'message': data['message'],
-        'booking': data['booking'],
-      };
+      return response;
     } catch (e) {
       print('Cancel booking error: $e');
       rethrow;
@@ -131,7 +161,7 @@ class LabourBookingService {
     String? review,
   }) async {
     try {
-      final response = await _httpClient.post(
+        final response = await HttpClient.post(
         '${ApiConfig.labourEndpoint}/bookings/$bookingId/rate',
         {
           'rating': rating,
@@ -139,15 +169,24 @@ class LabourBookingService {
         },
       );
 
-      final data = json.decode(response.body);
-      return {
-        'message': data['message'],
-        'rating': data['rating'],
-      };
+      return response;
     } catch (e) {
       print('Rate partner error: $e');
       rethrow;
     }
+  }
+
+  // Alias for submitRating (used in screens)
+  Future<Map<String, dynamic>> submitRating({
+    required String bookingId,
+    required int rating,
+    String? review,
+  }) async {
+    return await ratePartner(
+      bookingId: bookingId,
+      rating: rating,
+      review: review,
+    );
   }
 
   // Update booking status (Partner side)
@@ -156,16 +195,12 @@ class LabourBookingService {
     String status,
   ) async {
     try {
-      final response = await _httpClient.put(
+        final response = await HttpClient.put(
         '${ApiConfig.labourEndpoint}/bookings/$bookingId/status',
         {'status': status},
       );
 
-      final data = json.decode(response.body);
-      return {
-        'message': data['message'],
-        'booking': data['booking'],
-      };
+      return response;
     } catch (e) {
       print('Update status error: $e');
       rethrow;
@@ -184,13 +219,8 @@ class LabourBookingService {
         url += '&skill=$skill';
       }
 
-      final response = await _httpClient.get(url);
-
-      final data = json.decode(response.body);
-      return {
-        'partners': data['partners'],
-        'pagination': data['pagination'],
-      };
+      final response = await HttpClient.get(url);
+      return response;
     } catch (e) {
       print('Get available partners error: $e');
       rethrow;

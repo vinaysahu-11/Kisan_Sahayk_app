@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_localizations.dart';
+import '../theme/app_colors.dart';
 
 class DashboardScreen extends StatefulWidget {
   final bool showAppBar;
@@ -27,6 +28,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<ServiceCard> _getServices(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return [
+      ServiceCard(
+        title: 'AI Krishi Mitra',
+        description: 'Smart Farming Assistant',
+        icon: Icons.psychology_alt,
+        color: const Color(0xFF00BFA5), // Teal-green for AI
+        route: '/ai-assistant',
+      ),
       ServiceCard(
         title: l10n.weather,
         description: l10n.weatherForecast,
@@ -96,10 +104,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-            ),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient(context),
           ),
         ),
       ) : null,
@@ -110,10 +116,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               height: 180,
               width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-                ),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient(context),
               ),
               child: Stack(
                 children: [
@@ -270,12 +274,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAF8), Color(0xFFE8F5E9)],
-          ),
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient(context),
         ),
         child: SafeArea(
           child: Column(
@@ -285,9 +285,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-                    ),
+                    gradient: AppColors.primaryGradient(context),
                     boxShadow: [
                       BoxShadow(
                         color: const Color.fromRGBO(0, 0, 0, 0.1),
@@ -335,9 +333,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-                      ),
+                      gradient: AppColors.primaryGradient(context),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(

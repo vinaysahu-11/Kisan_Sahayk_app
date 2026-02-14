@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../theme/app_colors.dart';
 import '../../utils/app_localizations.dart';
 
 class TransportPartnerCompleteRegistration extends StatefulWidget {
@@ -53,7 +54,7 @@ class _TransportPartnerCompleteRegistrationState extends State<TransportPartnerC
       navigator.pop();
       messenger.showSnackBar(
         SnackBar(
-          content: Text(loc.translate('registration_submitted')),
+          content: Text(AppLocalizations.of(context)!.translate('registration_submitted')),
           backgroundColor: const Color(0xFF2E6B3F),
           duration: const Duration(seconds: 3),
         ),
@@ -69,10 +70,8 @@ class _TransportPartnerCompleteRegistrationState extends State<TransportPartnerC
         title: Text(AppLocalizations.of(context)!.translate('transport_partner_registration'), style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2E6B3F), Color(0xFF3F8D54)],
-            ),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient(context),
           ),
         ),
       ),
