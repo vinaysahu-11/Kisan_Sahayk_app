@@ -21,7 +21,7 @@ class HttpClient {
       print('📥 Status: ${response.statusCode}');
       return _handleResponse(response);
     } catch (e) {
-      print('❌ GET Error: $e');
+      print('GET Error: $e');
       rethrow;
     }
   }
@@ -51,7 +51,7 @@ class HttpClient {
       print('📥 Status: ${response.statusCode}');
       return _handleResponse(response);
     } catch (e) {
-      print('❌ POST Error: $e');
+      print('POST Error: $e');
       rethrow;
     }
   }
@@ -81,7 +81,7 @@ class HttpClient {
       print('📥 Status: ${response.statusCode}');
       return _handleResponse(response);
     } catch (e) {
-      print('❌ PUT Error: $e');
+      print('PUT Error: $e');
       rethrow;
     }
   }
@@ -103,7 +103,7 @@ class HttpClient {
       print('📥 Status: ${response.statusCode}');
       return _handleResponse(response);
     } catch (e) {
-      print('❌ DELETE Error: $e');
+      print('DELETE Error: $e');
       rethrow;
     }
   }

@@ -54,8 +54,8 @@ class TransportPartnerEntry extends StatelessWidget {
             const SizedBox(height: 40),
             _buildFeatureItem('🚛', 'Own your vehicle'),
             _buildFeatureItem('💰', 'Flexible earnings'),
-            _buildFeatureItem('📱', 'Easy booking management'),
-            _buildFeatureItem('⭐', 'Build your reputation'),
+            _buildFeatureItem('Simple', 'Easy booking management'),
+            _buildFeatureItem('Rating', 'Build your reputation'),
             const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,

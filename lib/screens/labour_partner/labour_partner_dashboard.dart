@@ -179,7 +179,7 @@ class _LabourPartnerDashboardScreenState extends State<LabourPartnerDashboardScr
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildStatCard('Rating', '4.5 ⭐', Icons.star, Colors.amber),
+                        child: _buildStatCard('Rating', '4.5', Icons.star, Colors.amber),
                       ),
                     ],
                   ),

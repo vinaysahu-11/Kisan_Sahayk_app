@@ -22,7 +22,7 @@ class AiService {
 
   /// Handle HTTP errors with detailed logging
   Exception _handleError(String operation, dynamic error, {http.Response? response}) {
-    print('❌ AI Service Error [$operation]');
+    print('AI Service Error [$operation]');
     print('Error: $error');
     
     if (response != null) {

@@ -199,7 +199,7 @@ class _DeliveryEarningsScreenState extends State<DeliveryEarningsScreen> {
             _buildDetailRow('Acceptance Rate', '${partner.acceptanceRate}%'),
             _buildDetailRow('On-Time Rate', '${partner.onTimeRate}%'),
             _buildDetailRow('Cancellation Rate', '${partner.cancellationRate}%'),
-            _buildDetailRow('Rating', '${partner.rating}⭐'),
+            _buildDetailRow('Rating', '${partner.rating}'),
           ],
         ),
       ),

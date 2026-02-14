@@ -48,10 +48,10 @@ class VoiceNavigationService {
           break;
 
         default:
-          print('⚠️ Unknown intent: $intent');
+          print('Unknown intent: $intent');
       }
     } catch (e) {
-      print('❌ Navigation error: $e');
+      print('Navigation error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Navigation failed: $e')),
       );

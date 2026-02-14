@@ -1,3 +1,5 @@
+// Dashboard - Main service hub for farmers
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/app_localizations.dart';
@@ -19,6 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is String) {
       setState(() => userName = args);
@@ -27,14 +30,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<ServiceCard> _getServices(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
     return [
       ServiceCard(
         title: 'AI Krishi Mitra',
         description: 'Smart Farming Assistant',
         icon: Icons.psychology_alt,
-        color: const Color(0xFF00BFA5), // Teal-green for AI
+        color: const Color(0xFF00BFA5),
         route: '/ai-assistant',
       ),
+      
       ServiceCard(
         title: l10n.weather,
         description: l10n.weatherForecast,
@@ -42,6 +47,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: const Color(0xFF4A90E2),
         route: '/weather',
       ),
+      
       ServiceCard(
         title: l10n.buyProduct,
         description: 'Seeds, Tools & More',
@@ -49,6 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: const Color(0xFF7B68EE),
         route: '/buy-product',
       ),
+      
       ServiceCard(
         title: l10n.transport,
         description: l10n.bookTransport,
@@ -56,13 +63,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: const Color(0xFFFF8C42),
         route: '/transport',
       ),
+      
       ServiceCard(
         title: l10n.labour,
         description: l10n.hireLabour,
-        icon: Icons.groups,
+        icon: Icons.people,
         color: const Color(0xFF26A69A),
         route: '/labour',
       ),
+      
       ServiceCard(
         title: l10n.sellProduct,
         description: l10n.listYourProduct,
@@ -70,6 +79,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: const Color(0xFFE91E63),
         route: '/sell-product',
       ),
+      
       ServiceCard(
         title: l10n.jobs,
         description: l10n.jobOpportunities,
@@ -87,6 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     
     return Scaffold(
       key: _scaffoldKey,
+      
       appBar: widget.showAppBar ? AppBar(
         title: Row(
           children: [
@@ -96,6 +107,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         actions: [
+
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
             onPressed: () {

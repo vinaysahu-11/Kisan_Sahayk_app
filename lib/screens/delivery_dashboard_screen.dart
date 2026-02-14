@@ -138,7 +138,7 @@ class _DeliveryDashboardScreenState extends State<DeliveryDashboardScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: _buildStatCard(
-                '${_partner.rating}⭐',
+                '${_partner.rating}',
                 'Rating',
                 Icons.star,
                 Colors.amber,

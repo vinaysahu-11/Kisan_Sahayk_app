@@ -105,7 +105,7 @@ class ProfileScreen extends StatelessWidget {
                 items: [
                   _InfoItem(icon: Icons.shopping_cart, label: 'Total Bookings', value: '12'),
                   _InfoItem(icon: Icons.sell, label: 'Products Listed', value: '5'),
-                  _InfoItem(icon: Icons.star, label: 'Rating', value: '4.5 ⭐'),
+                  _InfoItem(icon: Icons.star, label: 'Rating', value: '4.5'),
                 ],
               ),
             ],

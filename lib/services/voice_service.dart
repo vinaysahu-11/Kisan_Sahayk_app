@@ -1,14 +1,25 @@
+// Voice Service - Recording aur Text processing
+// Mobile: Voice recording, Web: Text input only
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../config/api_config.dart';
 
 class VoiceService {
+  // Audio recorder (mobile only)
   final AudioRecorder _recorder = AudioRecorder();
+  
+  // Text-to-Speech engine
   final FlutterTts _tts = FlutterTts();
+  
+  // Current session ID for maintaining conversation context
   String? _currentSessionId;
+  
+  // Recording state flag
   bool _isRecording = false;
 
   // Initialize TTS
@@ -19,9 +30,13 @@ class VoiceService {
     await _tts.setPitch(1.0);
   }
 
-  // Start recording
-  Future<bool> startRecording() async {
+  Future<void> startRecording() async {
     try {
+      if (kIsWeb) {
+        _isRecording = true;
+        return;
+      }
+
       if (await _recorder.hasPermission()) {
         final directory = await getTemporaryDirectory();
         final path = '${directory.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
@@ -36,12 +51,10 @@ class VoiceService {
         );
         
         _isRecording = true;
-        return true;
+        return;
       }
-      return false;
     } catch (e) {
-      print('❌ Start recording error: $e');
-      return false;
+      print('Start recording error: $e');
     }
   }
 
@@ -52,6 +65,16 @@ class VoiceService {
     try {
       if (!_isRecording) return null;
 
+      // For web, we can't actually record, so return a message
+      if (kIsWeb) {
+        _isRecording = false;
+        return {
+          'success': false,
+          'message': 'Please use text input on web browser',
+          'isWeb': true,
+        };
+      }
+
       final path = await _recorder.stop();
       _isRecording = false;
 
@@ -59,7 +82,7 @@ class VoiceService {
         throw Exception('Recording failed');
       }
 
-      print('📁 Audio file saved: $path');
+      print('Audio file saved: $path');
 
       // Send to backend
       final result = await _sendVoiceToBackend(path, language);
@@ -71,8 +94,55 @@ class VoiceService {
 
       return result;
     } catch (e) {
-      print('❌ Stop recording error: $e');
+      print('Stop recording error: $e');
       return null;
+    }
+  }
+
+  // Process text directly (for web and testing)
+  Future<Map<String, dynamic>?> processText({
+    required String text,
+    required String language,
+  }) async {
+    try {
+      print('📤 Sending text to backend...');
+
+      final uri = Uri.parse('${ApiConfig.baseUrl}/voice/process-text');
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'text': text,
+          'language': language,
+          'sessionId': _currentSessionId,
+        }),
+      ).timeout(const Duration(seconds: 30));
+
+      print('📥 Text response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Save session ID
+        if (data['sessionId'] != null) {
+          _currentSessionId = data['sessionId'];
+        }
+
+        // Speak the response
+        if (data['success'] == true) {
+          await speak(data['message'], language);
+        }
+
+        return data;
+      } else {
+        throw Exception('Failed to process text: ${response.body}');
+      }
+    } catch (e) {
+      print('Process text error: $e');
+      return {
+        'success': false,
+        'error': e.toString(),
+      };
     }
   }
 
@@ -122,7 +192,7 @@ class VoiceService {
         throw Exception('Failed to process voice: ${response.body}');
       }
     } catch (e) {
-      print('❌ Voice service error: $e');
+      print('Voice service error: $e');
       return {
         'success': false,
         'error': e.toString(),
@@ -136,7 +206,7 @@ class VoiceService {
       await initTts(language: language);
       await _tts.speak(text);
     } catch (e) {
-      print('❌ TTS error: $e');
+      print('TTS error: $e');
       // Silently fail - TTS might not be available on web without user interaction
     }
   }
@@ -146,17 +216,14 @@ class VoiceService {
     try {
       await _tts.stop();
     } catch (e) {
-      print('❌ Stop TTS error: $e');
+      print('Stop TTS error: $e');
     }
   }
 
-  // Check if recording
   bool get isRecording => _isRecording;
 
-  // Get session ID
   String? get sessionId => _currentSessionId;
 
-  // Start new session
   void startNewSession() {
     _currentSessionId = null;
   }
@@ -174,12 +241,12 @@ class VoiceService {
       }
       return [];
     } catch (e) {
-      print('❌ Get voice history error: $e');
+      print('Get voice history error: $e');
       return [];
     }
   }
 
-  // Get specific session
+
   Future<Map<String, dynamic>?> getSession(String sessionId) async {
     try {
       final response = await http.get(
@@ -191,7 +258,7 @@ class VoiceService {
       }
       return null;
     } catch (e) {
-      print('❌ Get session error: $e');
+      print('Get session error: $e');
       return null;
     }
   }
@@ -207,7 +274,7 @@ class VoiceService {
       
       _currentSessionId = null;
     } catch (e) {
-      print('❌ End session error: $e');
+      print('End session error: $e');
     }
   }
 

@@ -409,7 +409,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               if (analysis.irrigation.isNotEmpty)
                 _buildSection('Irrigation', analysis.irrigation),
               if (analysis.warnings.isNotEmpty)
-                _buildListSection('⚠️ Warnings', analysis.warnings),
+                _buildListSection('Warnings', analysis.warnings),
               if (analysis.shops.isNotEmpty)
                 _buildShopsSection(analysis.shops),
             ],

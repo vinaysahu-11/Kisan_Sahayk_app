@@ -1,36 +1,38 @@
+// Kisan Sahayk App - Farmers ke liye complete solution
+// Features: AI Assistant, Voice Commands, Transport, Labour, Buy/Sell
+// Multi-language: Hindi, English, Chhattisgarhi
+
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+
+// Core utilities
 import 'utils/app_localizations.dart';
 import 'providers/language_provider.dart';
+import 'providers/theme_provider.dart';
+
+// Authentication screens
 import 'package:fks_app/screens/login_screen.dart';
 import 'package:fks_app/screens/signup_screen.dart';
-import 'package:fks_app/screens/buy_product_screen.dart';
-import 'package:fks_app/screens/transport_screen.dart';
-import 'package:fks_app/screens/transport_booking/transport_booking_map_screen.dart';
-import 'package:fks_app/screens/labour_screen.dart';
-import 'package:fks_app/screens/labour_skill_selection_screen.dart';
-import 'package:fks_app/screens/labour_partner_screen.dart';
-import 'package:fks_app/screens/sell_product_screen.dart';
-import 'package:fks_app/screens/job_screen.dart';
+import 'package:fks_app/screens/seller_login_screen.dart';
+
+// Main screens
+import 'package:fks_app/screens/main_wrapper_screen.dart';
 import 'package:fks_app/screens/profile_screen.dart';
 import 'package:fks_app/screens/notifications_screen.dart';
 import 'package:fks_app/screens/settings_screen.dart';
 import 'package:fks_app/screens/help_screen.dart';
 import 'package:fks_app/screens/about_screen.dart';
 import 'package:fks_app/screens/language_screen.dart';
-import 'package:fks_app/screens/main_wrapper_screen.dart';
-import 'package:fks_app/screens/seller_login_screen.dart';
-import 'package:fks_app/screens/admin_category_screen.dart';
-import 'package:fks_app/screens/admin_seller_screen.dart';
-import 'package:fks_app/widgets/auth_wrapper.dart';
-import 'providers/theme_provider.dart';
+
+// AI aur Voice features
 import 'package:fks_app/screens/ai_assistant_screen.dart';
 import 'package:fks_app/screens/voice_assistant_screen.dart';
+
+// Buyer module
 import 'package:fks_app/screens/buyer_home_screen.dart';
 import 'package:fks_app/screens/buyer_product_list_screen.dart';
 import 'package:fks_app/screens/buyer_product_detail_screen.dart';
@@ -41,13 +43,29 @@ import 'package:fks_app/screens/buyer_address_screen.dart';
 import 'package:fks_app/screens/buyer_orders_screen.dart';
 import 'package:fks_app/screens/buyer_order_detail_screen.dart';
 import 'package:fks_app/screens/buyer_rating_screen.dart';
-import 'package:fks_app/screens/weather_screen.dart';
-import 'package:fks_app/screens/bookings_screen.dart';
-import 'package:fks_app/screens/transport_partner/transport_partner_entry.dart';
-import 'package:fks_app/screens/transport_partner/transport_partner_dashboard.dart';
 import 'package:fks_app/screens/buyer_wallet_screen.dart';
 import 'package:fks_app/screens/buyer_return_screen.dart';
 import 'package:fks_app/screens/buyer_notifications_screen.dart';
+import 'package:fks_app/screens/buy_product_screen.dart';
+import 'package:fks_app/screens/sell_product_screen.dart';
+
+// Transport module
+import 'package:fks_app/screens/transport_screen.dart';
+import 'package:fks_app/screens/transport_booking/transport_booking_map_screen.dart';
+import 'package:fks_app/screens/bookings_screen.dart';
+import 'package:fks_app/screens/transport_partner/transport_partner_entry.dart';
+import 'package:fks_app/screens/transport_partner/transport_partner_dashboard.dart';
+
+// Labour module
+import 'package:fks_app/screens/labour_screen.dart';
+import 'package:fks_app/screens/labour_skill_selection_screen.dart';
+import 'package:fks_app/screens/labour_partner_screen.dart';
+
+// Other modules
+import 'package:fks_app/screens/job_screen.dart';
+import 'package:fks_app/screens/weather_screen.dart';
+
+// Delivery partner
 import 'package:fks_app/screens/delivery_registration_screen.dart';
 import 'package:fks_app/screens/delivery_application_status_screen.dart';
 import 'package:fks_app/screens/delivery_dashboard_screen.dart';
@@ -59,7 +77,14 @@ import 'package:fks_app/screens/delivery_performance_screen.dart';
 import 'package:fks_app/screens/delivery_cod_screen.dart';
 import 'package:fks_app/screens/delivery_notifications_screen.dart';
 import 'package:fks_app/screens/delivery_safety_screen.dart';
+
+// Admin module
+import 'package:fks_app/screens/admin_category_screen.dart';
+import 'package:fks_app/screens/admin_seller_screen.dart';
 import 'package:fks_app/screens/admin_delivery_partners_screen.dart';
+
+// Configuration
+import 'package:fks_app/widgets/auth_wrapper.dart';
 import 'package:fks_app/config/api_config.dart';
 
 const String kLogoPath = 'assets/images/kisan_sahayk_logo.png';
@@ -70,22 +95,21 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Print API configuration on startup for debugging
+  // Backend connection info print karenge
   ApiConfig.printConfig();
   
-  // Initialize error handling
+  // Error handling setup
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    // Log to a service or print in debug
     debugPrint('Flutter Error: ${details.exception}');
   };
   
-  // Catch asynchronous errors
   PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('Native/Async Error: $error');
+    debugPrint('Async Error: $error');
     return true;
   };
 
+  // Language aur theme load karo
   final languageProvider = LanguageProvider();
   await languageProvider.loadSavedLanguage();
   

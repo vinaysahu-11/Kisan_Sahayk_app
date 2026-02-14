@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../screens/login_screen.dart';
-import '../screens/main_wrapper_screen.dart';
 // If you have an AuthProvider, import it here
 // import '../providers/auth_provider.dart';
 
@@ -11,9 +10,10 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Replace with your actual auth provider logic
+    // For now, skip auth and go directly to main app
+    // TODO: Implement proper auth provider logic
     // final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
-    const isLoggedIn = false; // TODO: Replace with real auth state
-    return isLoggedIn ? const MainWrapperScreen() : const LoginScreen();
+    // return isLoggedIn ? const MainWrapperScreen() : const LoginScreen();
+    return const LoginScreen();
   }
 }

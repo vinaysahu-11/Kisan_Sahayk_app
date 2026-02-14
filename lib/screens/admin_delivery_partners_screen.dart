@@ -101,7 +101,7 @@ class _AdminDeliveryPartnersScreenState extends State<AdminDeliveryPartnersScree
               children: [
                 _buildDetailRow('Email', partner.email),
                 _buildDetailRow('Vehicle', '${partner.vehicleType.name.toUpperCase()} - ${partner.vehicleNumber}'),
-                _buildDetailRow('Rating', '${partner.rating}⭐ (${partner.totalDeliveries} deliveries)'),
+                _buildDetailRow('Rating', '${partner.rating} (${partner.totalDeliveries} deliveries)'),
                 _buildDetailRow('Acceptance Rate', '${partner.acceptanceRate}%'),
                 _buildDetailRow('On-Time Rate', '${partner.onTimeRate}%'),
                 _buildDetailRow('Cancellation Rate', '${partner.cancellationRate}%'),

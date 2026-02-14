@@ -17,7 +17,7 @@ class AuthService {
       print('📤 Signup Request - Name: $name, Phone: $phone, Role: ${role ?? 'buyer'}');
       
       final url = Uri.parse('${ApiConfig.authEndpoint}/register');
-      print('🌐 URL: $url');
+      print('URL: $url');
 
       final body = jsonEncode({
         'name': name,
@@ -46,7 +46,7 @@ class AuthService {
           phone: data['user']['phone'],
         );
         
-        print('✅ Signup Successful! Token saved.');
+        print('Signup Successful! Token saved.');
         return data;
       } else if (response.statusCode == 400) {
         final error = jsonDecode(response.body);

@@ -172,7 +172,7 @@ class _TransportPartnerDashboardScreenState extends State<TransportPartnerDashbo
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _buildStatCard('Rating', '⭐ $rating', Icons.star),
+                  child: _buildStatCard('Rating', '$rating', Icons.star),
                 ),
               ],
             ),

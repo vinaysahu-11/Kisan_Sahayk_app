@@ -1,9 +1,15 @@
+// Voice Assistant - Voice/Text commands ka chat interface
+// Commands: "Transport chahiye", "Mausam dikhao", "Beej kharidna hai" etc.
+
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import '../services/voice_service.dart';
 import '../services/voice_navigation_service.dart';
 import '../providers/language_provider.dart';
 
+/// Voice Assistant Screen Widget
+/// Provides conversational interface for voice/text commands
 class VoiceAssistantScreen extends StatefulWidget {
   const VoiceAssistantScreen({super.key});
 
@@ -13,12 +19,23 @@ class VoiceAssistantScreen extends StatefulWidget {
 
 class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     with SingleTickerProviderStateMixin {
+  // Voice processing service
   final VoiceService _voiceService = VoiceService();
+  
+  // Navigation service for intent-based routing
   late VoiceNavigationService _navigationService;
   
+  // Text input controller (for web platform)
+  final TextEditingController _textController = TextEditingController();
+  
+  // Conversation messages list
   final List<Map<String, dynamic>> _messages = [];
-  bool _isRecording = false;
-  bool _isProcessing = false;
+  
+  // State flags
+  bool _isRecording = false; // Recording in progress
+  bool _isProcessing = false; // Processing command
+  
+  // Animation controller for visual effects
   late AnimationController _waveController;
 
   @override
@@ -40,9 +57,15 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   void _addGreeting() {
     final lang = Provider.of<LanguageProvider>(context, listen: false).locale.languageCode;
     final greetings = {
-      'en': 'Hello! What would you like to do today?',
-      'hi': 'नमस्ते! आप क्या करना चाहते हैं?',
-      'cg': 'नमस्कार! तुमन का करे चाहत हव?',
+      'en': kIsWeb 
+          ? 'Hello! Type your command below or ask me anything!'
+          : 'Hello! What would you like to do today?',
+      'hi': kIsWeb 
+          ? 'नमस्ते! नीचे अपना आदेश टाइप करें या मुझसे कुछ भी पूछें!'
+          : 'नमस्ते! आप क्या करना चाहते हैं?',
+      'cg': kIsWeb 
+          ? 'नमस्कार! नीचे अपन आदेश लिखव या मोला कुछ भी पूछव!'
+          : 'नमस्कार! तुमन का करे चाहत हव?',
     };
     
     setState(() {
@@ -57,7 +80,61 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     // User can tap mic button to start interaction
   }
 
+  Future<void> _processTextInput() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    setState(() {
+      _isProcessing = true;
+      // Add user message immediately
+      _messages.add({
+        'role': 'user',
+        'content': text,
+        'timestamp': DateTime.now(),
+      });
+    });
+
+    _textController.clear();
+
+    final lang = Provider.of<LanguageProvider>(context, listen: false).locale.languageCode;
+    final result = await _voiceService.processText(text: text, language: lang);
+
+    setState(() => _isProcessing = false);
+
+    if (result != null && result['success'] == true) {
+      // Add assistant response
+      setState(() {
+        _messages.add({
+          'role': 'assistant',
+          'content': result['message'],
+          'timestamp': DateTime.now(),
+        });
+      });
+
+      // Navigate if action is complete
+      if (result['complete'] == true && result['action'] != null) {
+        await Future.delayed(const Duration(seconds: 2));
+        
+        if (mounted) {
+          await _navigationService.navigateByIntent(
+            context: context,
+            intent: result['intent'],
+            entities: result['entities'] ?? {},
+          );
+        }
+      }
+    } else {
+      _showError('Failed to process command');
+    }
+  }
+
   Future<void> _toggleRecording() async {
+    // On web, show info about text input
+    if (kIsWeb) {
+      _showError('Please use text input below to send commands');
+      return;
+    }
+
     if (_isRecording) {
       // Stop recording
       setState(() => _isProcessing = true);
@@ -105,13 +182,8 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         _showError('Failed to process voice command');
       }
     } else {
-      // Start recording
-      final success = await _voiceService.startRecording();
-      if (success) {
-        setState(() => _isRecording = true);
-      } else {
-        _showError('Could not start recording. Check microphone permission.');
-      }
+      await _voiceService.startRecording();
+      setState(() => _isRecording = true);
     }
   }
 
@@ -251,7 +323,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                   ),
           ),
 
-          // Recording button
+          // Recording button and text input
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -265,63 +337,117 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
               ],
             ),
             child: SafeArea(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Stop speaking button
-                  if (!_isRecording)
-                    IconButton(
-                      icon: const Icon(Icons.volume_off),
-                      iconSize: 32,
-                      color: Colors.grey,
-                      onPressed: () => _voiceService.stopSpeaking(),
-                      tooltip: 'Stop Speaking',
-                    ),
-                  
-                  const SizedBox(width: 20),
-
-                  // Main mic button
-                  GestureDetector(
-                    onTap: _isProcessing ? null : _toggleRecording,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _isRecording
-                            ? Colors.red
-                            : const Color(0xFF2E6B3F),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (_isRecording ? Colors.red : const Color(0xFF2E6B3F))
-                                .withOpacity(0.3),
-                            blurRadius: 20,
-                            spreadRadius: 5,
+                  // Text input for web
+                  if (kIsWeb)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _textController,
+                              decoration: InputDecoration(
+                                hintText: 'Type your command...',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                              ),
+                              onSubmitted: (_) => _processTextInput(),
+                              enabled: !_isProcessing,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          FloatingActionButton(
+                            onPressed: _isProcessing ? null : _processTextInput,
+                            backgroundColor: const Color(0xFF2E6B3F),
+                            child: _isProcessing
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.send),
                           ),
                         ],
                       ),
-                      child: Icon(
-                        _isRecording ? Icons.stop : Icons.mic,
-                        size: 40,
-                        color: Colors.white,
+                    ),
+
+                  // Mic button row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Stop speaking button
+                      if (!_isRecording)
+                        IconButton(
+                          icon: const Icon(Icons.volume_off),
+                          iconSize: 32,
+                          color: Colors.grey,
+                          onPressed: () => _voiceService.stopSpeaking(),
+                          tooltip: 'Stop Speaking',
+                        ),
+                      
+                      const SizedBox(width: 20),
+
+                      // Main mic button
+                      GestureDetector(
+                        onTap: _isProcessing ? null : _toggleRecording,
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: kIsWeb 
+                                ? Colors.grey 
+                                : (_isRecording
+                                    ? Colors.red
+                                    : const Color(0xFF2E6B3F)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: (kIsWeb 
+                                    ? Colors.grey 
+                                    : (_isRecording ? Colors.red : const Color(0xFF2E6B3F)))
+                                    .withOpacity(0.3),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            kIsWeb 
+                                ? Icons.mic_off 
+                                : (_isRecording ? Icons.stop : Icons.mic),
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
+
+                      const SizedBox(width: 20),
+
+                      // End session button
+                      if (!_isRecording)
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          iconSize: 32,
+                          color: Colors.grey,
+                          onPressed: () async {
+                            await _voiceService.endSession();
+                            if (mounted) Navigator.of(context).pop();
+                          },
+                          tooltip: 'End Session',
+                        ),
+                    ],
                   ),
-
-                  const SizedBox(width: 20),
-
-                  // End session button
-                  if (!_isRecording)
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      iconSize: 32,
-                      color: Colors.grey,
-                      onPressed: () async {
-                        await _voiceService.endSession();
-                        if (mounted) Navigator.of(context).pop();
-                      },
-                      tooltip: 'End Session',
-                    ),
                 ],
               ),
             ),
@@ -382,6 +508,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   @override
   void dispose() {
     _waveController.dispose();
+    _textController.dispose();
     _voiceService.dispose();
     super.dispose();
   }
