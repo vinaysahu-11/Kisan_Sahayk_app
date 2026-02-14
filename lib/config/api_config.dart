@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
 
 class ApiConfig {
   // Base URL configuration
@@ -20,6 +20,7 @@ class ApiConfig {
   static String get labourEndpoint => '$baseUrl/labour';
   static String get transportEndpoint => '$baseUrl/transport';
   static String get weatherEndpoint => '$baseUrl/weather';
+  static String get aiEndpoint => '$baseUrl/ai';
   
   // Request timeout
   static const Duration timeout = Duration(seconds: 30);
@@ -34,4 +35,17 @@ class ApiConfig {
     ...headers,
     'Authorization': 'Bearer $token',
   };
+
+  // Debug info
+  static void printConfig() {
+    if (kDebugMode) {
+      print('═══════════════════════════════════');
+      print('🌐 API Configuration');
+      print('═══════════════════════════════════');
+      print('Platform: ${kIsWeb ? "Web" : (Platform.isAndroid ? "Android" : "iOS")}');
+      print('Base URL: $baseUrl');
+      print('AI Endpoint: $aiEndpoint');
+      print('═══════════════════════════════════');
+    }
+  }
 }

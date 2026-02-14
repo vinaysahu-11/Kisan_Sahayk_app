@@ -30,6 +30,7 @@ import 'package:fks_app/screens/admin_seller_screen.dart';
 import 'package:fks_app/widgets/auth_wrapper.dart';
 import 'providers/theme_provider.dart';
 import 'package:fks_app/screens/ai_assistant_screen.dart';
+import 'package:fks_app/screens/voice_assistant_screen.dart';
 import 'package:fks_app/screens/buyer_home_screen.dart';
 import 'package:fks_app/screens/buyer_product_list_screen.dart';
 import 'package:fks_app/screens/buyer_product_detail_screen.dart';
@@ -59,6 +60,7 @@ import 'package:fks_app/screens/delivery_cod_screen.dart';
 import 'package:fks_app/screens/delivery_notifications_screen.dart';
 import 'package:fks_app/screens/delivery_safety_screen.dart';
 import 'package:fks_app/screens/admin_delivery_partners_screen.dart';
+import 'package:fks_app/config/api_config.dart';
 
 const String kLogoPath = 'assets/images/kisan_sahayk_logo.png';
 const String kAppName = 'Kisan Sahayk';
@@ -67,6 +69,9 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Print API configuration on startup for debugging
+  ApiConfig.printConfig();
   
   // Initialize error handling
   FlutterError.onError = (details) {
@@ -227,6 +232,7 @@ class _MainAppState extends State<MainApp> {
         '/help': (context) => const HelpScreen(),
         '/about': (context) => const AboutScreen(),
         '/ai-assistant': (context) => const AiAssistantScreen(),
+        '/voice-assistant': (context) => const VoiceAssistantScreen(),
         '/seller-login': (context) => const SellerLoginScreen(),
         '/admin-categories': (context) => const AdminCategoryScreen(),
         '/admin-sellers': (context) => const AdminSellerScreen(),

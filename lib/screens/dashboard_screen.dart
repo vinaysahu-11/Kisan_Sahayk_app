@@ -430,6 +430,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ),
   ),
 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/voice-assistant');
+        },
+        backgroundColor: const Color(0xFF2E6B3F),
+        child: const Icon(Icons.mic, color: Colors.white, size: 32),
+        tooltip: 'Voice Assistant',
+      ),
     );
   }
 }

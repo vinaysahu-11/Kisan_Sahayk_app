@@ -4,7 +4,7 @@ const conversationSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: false, // Optional - allows anonymous users
   },
   title: {
     type: String,

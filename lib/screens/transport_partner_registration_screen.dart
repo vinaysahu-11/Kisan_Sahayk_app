@@ -123,7 +123,11 @@ class _TransportPartnerRegistrationScreenState
             prefixIcon: Icon(Icons.person),
             border: OutlineInputBorder(),
           ),
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Name is required';
+            if (v.trim().length < 3) return 'Name must be at least 3 characters';
+            return null;
+          },
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -132,9 +136,10 @@ class _TransportPartnerRegistrationScreenState
             labelText: 'Phone Number *',
             prefixIcon: Icon(Icons.phone),
             border: OutlineInputBorder(),
+            hintText: '10 digit mobile number',
           ),
           keyboardType: TextInputType.phone,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -143,8 +148,10 @@ class _TransportPartnerRegistrationScreenState
             labelText: 'Email (Optional)',
             prefixIcon: Icon(Icons.email),
             border: OutlineInputBorder(),
+            hintText: 'example@email.com',
           ),
           keyboardType: TextInputType.emailAddress,
+          validator: (v) => null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -153,10 +160,10 @@ class _TransportPartnerRegistrationScreenState
             labelText: 'Aadhaar Number *',
             prefixIcon: Icon(Icons.badge),
             border: OutlineInputBorder(),
+            hintText: '12 digit Aadhaar number',
           ),
           keyboardType: TextInputType.number,
-          maxLength: 12,
-          validator: (v) => v?.length != 12 ? 'Invalid Aadhaar' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
       ],
     );
@@ -172,7 +179,7 @@ class _TransportPartnerRegistrationScreenState
             prefixIcon: Icon(Icons.account_circle),
             border: OutlineInputBorder(),
           ),
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -181,9 +188,10 @@ class _TransportPartnerRegistrationScreenState
             labelText: 'Account Number *',
             prefixIcon: Icon(Icons.account_balance),
             border: OutlineInputBorder(),
+            hintText: '9-18 digits',
           ),
           keyboardType: TextInputType.number,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -192,9 +200,10 @@ class _TransportPartnerRegistrationScreenState
             labelText: 'IFSC Code *',
             prefixIcon: Icon(Icons.code),
             border: OutlineInputBorder(),
+            hintText: 'e.g. SBIN0001234',
           ),
           textCapitalization: TextCapitalization.characters,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -204,7 +213,7 @@ class _TransportPartnerRegistrationScreenState
             prefixIcon: Icon(Icons.business),
             border: OutlineInputBorder(),
           ),
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
       ],
     );
@@ -244,7 +253,7 @@ class _TransportPartnerRegistrationScreenState
             border: OutlineInputBorder(),
           ),
           keyboardType: TextInputType.number,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -255,7 +264,7 @@ class _TransportPartnerRegistrationScreenState
             border: OutlineInputBorder(),
           ),
           keyboardType: TextInputType.number,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -266,7 +275,7 @@ class _TransportPartnerRegistrationScreenState
             border: OutlineInputBorder(),
           ),
           keyboardType: TextInputType.number,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -277,7 +286,7 @@ class _TransportPartnerRegistrationScreenState
             border: OutlineInputBorder(),
           ),
           keyboardType: TextInputType.number,
-          validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
+          validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
         ),
         const SizedBox(height: 16),
         const Text(
@@ -302,7 +311,8 @@ class _TransportPartnerRegistrationScreenState
                   }
                 });
               },
-              selectedColor: const Color(0xFF2E7D32).withValues(alpha: 0.3),
+              selectedColor: const Color(0xFF2E7D32).withOpacity(0.3),
+              checkmarkColor: const Color(0xFF2E7D32),
             );
           }).toList(),
         ),
