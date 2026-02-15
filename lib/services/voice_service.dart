@@ -135,7 +135,7 @@ class VoiceService {
 
         return data;
       } else {
-        throw Exception('Failed to process text: ${response.body}');
+        throw Exception('Failed to proces     s text: ${response.body}');
       }
     } catch (e) {
       print('Process text error: $e');

@@ -25,7 +25,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS Configuration for Development
+// CORS Configuration for Development & Ngrok
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -33,6 +33,11 @@ const corsOptions = {
     
     // Allow all localhost origins for development
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Allow ngrok URLs
+    if (origin && origin.includes('ngrok')) {
       return callback(null, true);
     }
     
@@ -47,7 +52,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
 };
 
 app.use(cors(corsOptions));
@@ -105,6 +110,7 @@ const adminRoutes = require('./routes/admin');
 const weatherRoutes = require('./routes/weather');
 const aiRoutes = require('./routes/ai_routes');
 const voiceRoutes = require('./routes/voice_routes');
+const voiceGlobalRoutes = require('./routes/voice_global');
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -117,6 +123,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/voice', voiceGlobalRoutes);
 
 // 404 Handler
 app.use(notFound);
@@ -125,7 +132,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log('═══════════════════════════════════════════════');
   console.log('🚀 Kisan Sahayk Backend Server Started');
@@ -133,6 +140,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`📍 Local:    http://localhost:${PORT}`);
   console.log(`📍 Network:  http://0.0.0.0:${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('');
+  console.log('🔗 For ngrok: Run "ngrok http ${PORT}" in another terminal');
+  console.log('   Then update Flutter ApiConfig.ngrokUrl with the HTTPS URL');
   console.log('');
   console.log('📡 API Endpoints:');
   console.log(`   - Health:     GET  /health`);

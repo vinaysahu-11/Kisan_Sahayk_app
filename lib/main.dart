@@ -13,6 +13,9 @@ import 'package:provider/provider.dart';
 import 'utils/app_localizations.dart';
 import 'providers/language_provider.dart';
 import 'providers/theme_provider.dart';
+import 'services/voice_global_controller.dart';
+import 'widgets/voice_assistant_overlay.dart';
+import 'widgets/floating_voice_button.dart';
 
 // Authentication screens
 import 'package:fks_app/screens/login_screen.dart';
@@ -31,6 +34,7 @@ import 'package:fks_app/screens/language_screen.dart';
 // AI aur Voice features
 import 'package:fks_app/screens/ai_assistant_screen.dart';
 import 'package:fks_app/screens/voice_assistant_screen.dart';
+import 'package:fks_app/screens/voice_shortcuts_screen.dart';
 
 // Buyer module
 import 'package:fks_app/screens/buyer_home_screen.dart';
@@ -116,11 +120,16 @@ void main() async {
   final themeProvider = ThemeProvider();
   await themeProvider.loadSavedTheme();
   
+  // Voice global controller initialize
+  final voiceController = VoiceGlobalController();
+  await voiceController.initialize();
+  
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: languageProvider),
         ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider.value(value: voiceController),
       ],
       child: const MainApp(),
     ),
@@ -142,8 +151,18 @@ class _MainAppState extends State<MainApp> {
     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       locale: languageProvider.locale,
       themeMode: themeProvider.themeMode,
+      builder: (context, child) {
+        return Stack(
+          children: [
+            child ?? const SizedBox.shrink(),
+            const VoiceAssistantOverlay(),
+            const FloatingVoiceButton(),
+          ],
+        );
+      },
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -257,6 +276,7 @@ class _MainAppState extends State<MainApp> {
         '/about': (context) => const AboutScreen(),
         '/ai-assistant': (context) => const AiAssistantScreen(),
         '/voice-assistant': (context) => const VoiceAssistantScreen(),
+        '/voice-shortcuts': (context) => const VoiceShortcutsScreen(),
         '/seller-login': (context) => const SellerLoginScreen(),
         '/admin-categories': (context) => const AdminCategoryScreen(),
         '/admin-sellers': (context) => const AdminSellerScreen(),
