@@ -1,13 +1,26 @@
 const aiService = require('../services/ai_service');
 
-// Main chat handler
+// Main chat handler with timeout protection
 exports.handleChat = async (req, res) => {
+  const requestId = Date.now();
+  console.log(`\n${'='.repeat(50)}`);
+  console.log(`📨 [${requestId}] AI Chat Request Received`);
+  console.log(`${'='.repeat(50)}`);
+  
   try {
     const { message, conversationId, language, location } = req.body;
     const userId = req.user?.id || req.userId || null;
     
+    console.log(`[${requestId}] User: ${userId || 'anonymous'}`);
+    console.log(`[${requestId}] Message: ${message?.substring(0, 50)}...`);
+    console.log(`[${requestId}] Language: ${language || 'en'}`);
+    
     if (!message || message.trim() === '') {
-      return res.status(400).json({ message: 'Message is required' });
+      console.log(`[${requestId}] ❌ Empty message`);
+      return res.status(400).json({ 
+        success: false,
+        message: 'Message is required' 
+      });
     }
 
     const context = {
@@ -16,14 +29,30 @@ exports.handleChat = async (req, res) => {
       location,
     };
 
-    const response = await aiService.getChatResponse(message, userId, context);
+    // Timeout protection: 20 seconds max for entire operation
+    const responsePromise = aiService.getChatResponse(message, userId, context);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Request timeout after 20 seconds')), 20000)
+    );
+
+    const response = await Promise.race([responsePromise, timeoutPromise]);
+    
+    console.log(`[${requestId}] ✅ Response ready, sending to client`);
     res.json(response);
+    
   } catch (error) {
-    console.error('Chat Error:', error);
+    console.error(`[${requestId}] ❌ Chat Error:`, error.message);
+    
+    // Always return a valid JSON response, never hang
     res.status(500).json({ 
-      message: 'Error processing chat request', 
-      error: error.message 
+      success: false,
+      message: error.message.includes('timeout') 
+        ? 'AI is taking too long to respond. Please try again with a shorter message.'
+        : 'AI service temporarily unavailable. Please try again.',
+      error: error.message
     });
+  } finally {
+    console.log(`${'='.repeat(50)}\n`);
   }
 };
 

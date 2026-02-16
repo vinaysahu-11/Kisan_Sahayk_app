@@ -99,6 +99,25 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// AI Health Check - Test if AI service is configured
+app.get('/api/ai/health', (req, res) => {
+  const geminiConfigured = !!process.env.GEMINI_API_KEY;
+  const openaiConfigured = !!process.env.OPENAI_API_KEY;
+  const useGemini = process.env.USE_GEMINI !== 'false';
+  
+  res.json({
+    success: true,
+    status: (geminiConfigured || openaiConfigured) ? 'Configured' : 'Not Configured',
+    aiEngine: useGemini ? 'Gemini' : 'OpenAI',
+    geminiKey: geminiConfigured ? 'Present' : 'Missing',
+    openaiKey: openaiConfigured ? 'Present' : 'Missing',
+    message: (geminiConfigured || openaiConfigured) 
+      ? 'AI service is ready' 
+      : 'No AI API key configured. Set GEMINI_API_KEY or OPENAI_API_KEY in .env',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Import Routes
 const authRoutes = require('./routes/auth');
 const buyerRoutes = require('./routes/buyer');

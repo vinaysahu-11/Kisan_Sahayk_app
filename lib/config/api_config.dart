@@ -95,11 +95,11 @@ class ApiConfig {
   // ⚙️ HTTP CONFIGURATION
   // ========================================
   
-  /// Default timeout for API requests
-  static const Duration timeout = Duration(seconds: 30);
+  /// Default timeout for API requests (increased for AI calls)
+  static const Duration timeout = Duration(seconds: 60);
   
   /// Connect timeout
-  static const Duration connectTimeout = Duration(seconds: 15);
+  static const Duration connectTimeout = Duration(seconds: 20);
   
   /// Default headers for all requests
   static Map<String, String> get headers => {

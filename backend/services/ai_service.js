@@ -34,9 +34,12 @@ const getSystemPrompt = (language) => {
 };
 
 /**
- * Call Google Gemini API (FREE)
+ * Call Google Gemini API (FREE) with timeout protection
  */
 const callGemini = async (messages, temperature = 0.7) => {
+  console.log('🤖 Calling Gemini API...');
+  const startTime = Date.now();
+  
   try {
     // Convert messages to Gemini format
     const prompt = messages
@@ -47,113 +50,164 @@ const callGemini = async (messages, temperature = 0.7) => {
     const systemPrompt = messages.find(m => m.role === 'system')?.content || '';
     const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt;
 
-    const response = await axios.post(
-      `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
-      {
-        contents: [{
-          parts: [{ text: fullPrompt }]
-        }],
-        generationConfig: {
-          temperature,
-          maxOutputTokens: 2048,
+    // Timeout protection: 18 seconds max
+    const response = await Promise.race([
+      axios.post(
+        `${GEMINI_API_URL}?key=${GEMINI_API_KEY}`,
+        {
+          contents: [{
+            parts: [{ text: fullPrompt }]
+          }],
+          generationConfig: {
+            temperature,
+            maxOutputTokens: 800, // Reduced from 2048 to speed up response
+          }
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 18000 // 18 second axios timeout
         }
-      },
-      {
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+      ),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Gemini API timeout after 18s')), 18000)
+      )
+    ]);
 
+    const duration = Date.now() - startTime;
+    console.log(`✅ Gemini response received in ${duration}ms`);
+    
     return response.data.candidates[0].content.parts[0].text;
   } catch (error) {
-    console.error('Gemini API Error:', error.response?.data || error.message);
-    throw new Error('Failed to get AI response from Gemini');
+    const duration = Date.now() - startTime;
+    console.error(`❌ Gemini API Error after ${duration}ms:`, error.response?.data || error.message);
+    throw new Error('AI service temporarily unavailable. Please try again.');
   }
 };
 
 /**
- * Make OpenAI API call (PAID)
+ * Make OpenAI API call (PAID) with timeout protection
  */
-const callOpenAI = async (messages, model = 'gpt-4o', temperature = 0.7, maxTokens = 1000) => {
+const callOpenAI = async (messages, model = 'gpt-4o', temperature = 0.7, maxTokens = 800) => {
+  console.log('🤖 Calling OpenAI API...');
+  const startTime = Date.now();
+  
   try {
-    const response = await axios.post(
-      AI_API_URL,
-      {
-        model,
-        messages,
-        temperature,
-        max_tokens: maxTokens,
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
+    // Timeout protection: 18 seconds max
+    const response = await Promise.race([
+      axios.post(
+        AI_API_URL,
+        {
+          model,
+          messages,
+          temperature,
+          max_tokens: maxTokens, // Reduced to 800 for faster response
         },
-      }
-    );
+        {
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 18000 // 18 second axios timeout
+        }
+      ),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('OpenAI API timeout after 18s')), 18000)
+      )
+    ]);
+    
+    const duration = Date.now() - startTime;
+    console.log(`✅ OpenAI response received in ${duration}ms`);
+    
     return response.data.choices[0].message.content;
   } catch (error) {
-    console.error('OpenAI API Error:', error.response?.data || error.message);
-    throw new Error('Failed to get AI response');
+    const duration = Date.now() - startTime;
+    console.error(`❌ OpenAI API Error after ${duration}ms:`, error.response?.data || error.message);
+    throw new Error('AI service temporarily unavailable. Please try again.');
   }
 };
 
 /**
- * Smart AI call - uses Gemini (free) or OpenAI (paid) based on config
+ * Smart AI call with fallback - uses Gemini (free) or OpenAI (paid) based on config
  */
 const callAI = async (messages, temperature = 0.7) => {
-  if (USE_GEMINI && GEMINI_API_KEY) {
-    return await callGemini(messages, temperature);
-  } else if (OPENAI_API_KEY) {
-    return await callOpenAI(messages, 'gpt-4o', temperature, 1500);
-  } else {
-    throw new Error('No AI API key configured. Set GEMINI_API_KEY or OPENAI_API_KEY in .env');
+  console.log('📡 AI Request received');
+  
+  try {
+    if (USE_GEMINI && GEMINI_API_KEY) {
+      return await callGemini(messages, temperature);
+    } else if (OPENAI_API_KEY) {
+      return await callOpenAI(messages, 'gpt-4o', temperature, 800); // Reduced tokens
+    } else {
+      throw new Error('No AI API key configured. Set GEMINI_API_KEY or OPENAI_API_KEY in .env');
+    }
+  } catch (error) {
+    console.error('❌ AI Call Failed:', error.message);
+    
+    // Return fallback response instead of crashing
+    return "I'm having trouble processing your request right now. Please try again in a moment. Our AI service is temporarily busy.";
   }
 };
 
 /**
- * Get a chat response from the AI with context memory.
+ * Get a chat response from the AI with context memory and timeout protection.
  */
 exports.getChatResponse = async (message, userId, context) => {
+  console.log('💬 Chat Request:', { userId, message: message.substring(0, 50) });
+  const requestStart = Date.now();
+  
   const { conversationId, language = 'en', location } = context;
 
-  let conversation;
-  if (conversationId) {
-    conversation = await AIConversation.findById(conversationId);
-    // Check ownership only if userId exists
-    if (!conversation || (userId && conversation.userId && conversation.userId.toString() !== userId.toString())) {
-      throw new Error('Conversation not found or unauthorized');
+  try {
+    let conversation;
+    if (conversationId) {
+      conversation = await AIConversation.findById(conversationId);
+      // Check ownership only if userId exists
+      if (!conversation || (userId && conversation.userId && conversation.userId.toString() !== userId.toString())) {
+        throw new Error('Conversation not found or unauthorized');
+      }
+    } else {
+      conversation = new AIConversation({ 
+        userId: userId || null, // Allow null for anonymous users
+        title: message.substring(0, 50) 
+      });
     }
-  } else {
-    conversation = new AIConversation({ 
-      userId: userId || null, // Allow null for anonymous users
-      title: message.substring(0, 50) 
-    });
+
+    // Limit context to last 6 messages to reduce prompt size
+    const recentMessages = conversation.messages.slice(-6);
+    
+    // Build message history for context
+    const messages = [
+      { role: 'system', content: getSystemPrompt(language) },
+      ...recentMessages.map(msg => ({ role: msg.role, content: msg.content })),
+      { role: 'user', content: message }
+    ];
+
+    console.log(`📝 Context: ${recentMessages.length} previous messages`);
+
+    // Call AI with timeout protection (Gemini or OpenAI based on config)
+    const aiResponseMessage = await callAI(messages);
+
+    // Save to conversation
+    conversation.messages.push({ role: 'user', content: message });
+    conversation.messages.push({ role: 'assistant', content: aiResponseMessage });
+    
+    await conversation.save();
+
+    const duration = Date.now() - requestStart;
+    console.log(`✅ Chat response completed in ${duration}ms`);
+
+    return {
+      conversationId: conversation._id,
+      message: aiResponseMessage,
+      metadata: {
+        model: USE_GEMINI ? 'gemini-2.5-flash' : 'gpt-4o',
+        language,
+      },
+    };
+  } catch (error) {
+    console.error('❌ Chat Error:', error.message);
+    throw error;
   }
-
-  // Build message history for context
-  const messages = [
-    { role: 'system', content: getSystemPrompt(language) },
-    ...conversation.messages.map(msg => ({ role: msg.role, content: msg.content })),
-    { role: 'user', content: message }
-  ];
-
-  // Call AI (Gemini or OpenAI based on config)
-  const aiResponseMessage = await callAI(messages);
-
-  // Save to conversation
-  conversation.messages.push({ role: 'user', content: message });
-  conversation.messages.push({ role: 'assistant', content: aiResponseMessage });
-  
-  await conversation.save();
-
-  return {
-    conversationId: conversation._id,
-    message: aiResponseMessage,
-    metadata: {
-      model: USE_GEMINI ? 'gemini-2.5-flash' : 'gpt-4o',
-      language,
-    },
-  };
 };
 
 const SoilAnalysis = require('../models/soil_analysis_model');
